@@ -46,7 +46,7 @@ try {
 // MongoDB connection
 const connectDB = async () => {
   try {
-    const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/hostel-food-analysis';
+    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/hostel-food-analysis';
     await mongoose.connect(mongoUri);
     console.log('✅ MongoDB Connected');
   } catch (error) {

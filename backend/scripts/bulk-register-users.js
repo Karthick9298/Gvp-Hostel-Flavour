@@ -184,7 +184,7 @@ const bulkRegister = async () => {
     // Confirm before proceeding
     console.log('⚠️  This will create real Firebase accounts and database records!');
     console.log('🔄 Starting registration in 5 seconds...');
-    await delay(5, 'preparation time');
+    await delay(0.5, 'preparation time');
     console.log('');
     
     const results = {
