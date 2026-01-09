@@ -4,7 +4,13 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import connectDB from './config/database.js';
+
+// Get current directory for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Import Routes
 import authRoutes from './routes/auth-firebase.js';
@@ -47,6 +53,10 @@ app.use(express.urlencoded({ extended: true }));
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+// Serve static files for analytics charts
+const analyticsOutputPath = path.join(__dirname, '../analytics-service/output');
+app.use('/analytics-images', express.static(analyticsOutputPath));
 
 // Health check endpoint
 app.get('/health', (req, res) => {

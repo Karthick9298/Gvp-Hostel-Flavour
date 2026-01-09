@@ -1,49 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import {
   AverageRatingPerMealChart,
   StudentRatingPerMealChart,
-  FeedbackDistributionChart,
-  AllMealsFeedbackDistributionChart,
-  SentimentScoreChart
+  AllMealsFeedbackDistributionChart
 } from '../../components/charts/DailyAnalysisCharts';
 import { 
   FaChartBar, 
   FaUsers, 
-  FaComments, 
-  FaRobot,
+  FaComments,
   FaCalendarAlt,
   FaStar,
   FaExclamationTriangle,
   FaChartLine,
   FaClock,
-  FaThumbsUp,
-  FaThumbsDown,
   FaUtensils,
   FaCoffee,
   FaLightbulb,
   FaExclamationCircle,
-  FaCheckCircle
+  FaCheckCircle,
+  FaSearch
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
 const DailyAnalysisDashboard = () => {
   const [dailyData, setDailyData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState(() => {
-    // Default to yesterday for analysis
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     return yesterday.toISOString().split('T')[0];
   });
 
-  useEffect(() => {
-    fetchDailyData();
-  }, [selectedDate]);
+  const handleAnalyzeClick = async () => {
+    if (!selectedDate) {
+      toast.error('Please select a date');
+      return;
+    }
 
-  const fetchDailyData = async () => {
     try {
       setLoading(true);
+      setDailyData(null);
       const response = await fetch(`http://localhost:5000/api/analytics/daily/${selectedDate}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('firebaseToken')}`
@@ -54,7 +51,6 @@ const DailyAnalysisDashboard = () => {
       if (data.status === 'success') {
         setDailyData(data.data);
       } else if (data.status === 'no_data') {
-        // Handle no data scenarios
         setDailyData({
           type: data.type,
           message: data.message,
@@ -105,7 +101,7 @@ const DailyAnalysisDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      {/* Enhanced Header */}
+      {/* Header */}
       <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-black bg-opacity-10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -127,10 +123,11 @@ const DailyAnalysisDashboard = () => {
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
           <div className="p-8">
             <div className="space-y-8">
+              {/* Date Selector */}
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-3xl font-bold text-gray-900">Daily Analysis</h2>
-                  <p className="text-gray-600 mt-1">Detailed insights for selected date (Previous days only)</p>
+                  <p className="text-gray-600 mt-1">Select a date and click 'Analyze' to view insights</p>
                 </div>
                 <div className="flex items-center space-x-4">
                   <label className="text-sm font-medium text-gray-700">Analysis Date:</label>
@@ -139,15 +136,50 @@ const DailyAnalysisDashboard = () => {
                       type="date"
                       value={selectedDate}
                       onChange={(e) => setSelectedDate(e.target.value)}
-                      max={new Date(Date.now() - 86400000).toISOString().split('T')[0]} // Yesterday max
+                      max={new Date(Date.now() - 86400000).toISOString().split('T')[0]}
                       className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+                      disabled={loading}
                     />
                     <FaCalendarAlt className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
                   </div>
+                  <button
+                    onClick={handleAnalyzeClick}
+                    disabled={loading || !selectedDate}
+                    className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-700 hover:to-purple-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl flex items-center space-x-2"
+                  >
+                    {loading ? (
+                      <>
+                        <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>Analyzing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <FaSearch />
+                        <span>Analyze</span>
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
 
-              {/* Handle different data states */}
+              {/* Initial State - No Data Loaded */}
+              {!loading && !dailyData && (
+                <div className="bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-dashed border-indigo-300 rounded-2xl p-12 text-center">
+                  <div className="flex items-center justify-center mb-6">
+                    <div className="p-6 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full">
+                      <FaChartBar className="text-indigo-600 text-4xl" />
+                    </div>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-3">Ready to Analyze</h3>
+                  <p className="text-gray-600 text-lg mb-2">Select a date from the calendar above</p>
+                  <p className="text-gray-500">Click the <span className="font-semibold text-indigo-600">'Analyze'</span> button to view detailed insights</p>
+                </div>
+              )}
+
+              {/* No Feedback State */}
               {dailyData && dailyData.type === 'no_feedback' && (
                 <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-8 text-center">
                   <div className="flex items-center justify-center mb-4">
@@ -160,6 +192,7 @@ const DailyAnalysisDashboard = () => {
                 </div>
               )}
 
+              {/* Future Date State */}
               {dailyData && dailyData.type === 'future_date' && (
                 <div className="bg-blue-50 border border-blue-200 rounded-2xl p-8 text-center">
                   <div className="flex items-center justify-center mb-4">
@@ -175,7 +208,7 @@ const DailyAnalysisDashboard = () => {
               {/* Success Data Display */}
               {dailyData && !dailyData.type && (
                 <>
-                  {/* Enhanced Overview Cards */}
+                  {/* Overview Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 text-white rounded-2xl p-8 shadow-xl relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-24 h-24 bg-white bg-opacity-10 rounded-full -mr-12 -mt-12"></div>
@@ -245,393 +278,254 @@ const DailyAnalysisDashboard = () => {
                     </div>
                   </div>
 
-                  {/* Enhanced Data Visualization Section */}
-                  <div>
+                  {/* Matplotlib/Seaborn Charts */}
+                  {dailyData.charts && (
+                    <div className="mt-8">
+                      <div className="mb-6">
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">AI-Generated Visual Analysis</h3>
+                        <p className="text-gray-600">Professional data visualizations using matplotlib & seaborn</p>
+                      </div>
+                      
+                      <div className="space-y-8">
+                        {dailyData.charts.avgRatings?.base64 && (
+                          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
+                            <h4 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
+                              <FaChartBar className="text-indigo-600" />
+                              <span>Average Ratings per Meal</span>
+                            </h4>
+                            <div className="flex justify-center">
+                              <img 
+                                src={dailyData.charts.avgRatings.base64} 
+                                alt="Average Ratings per Meal"
+                                className="max-w-full h-auto rounded-lg shadow-md"
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {dailyData.charts.distribution?.base64 && (
+                          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
+                            <h4 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
+                              <FaChartBar className="text-purple-600" />
+                              <span>Rating Distribution by Star</span>
+                            </h4>
+                            <div className="flex justify-center">
+                              <img 
+                                src={dailyData.charts.distribution.base64} 
+                                alt="Rating Distribution"
+                                className="max-w-full h-auto rounded-lg shadow-md"
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {dailyData.charts.sentiment?.base64 && (
+                          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
+                            <h4 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
+                              <FaComments className="text-green-600" />
+                              <span>Sentiment Analysis per Meal</span>
+                            </h4>
+                            <div className="flex justify-center">
+                              <img 
+                                src={dailyData.charts.sentiment.base64} 
+                                alt="Sentiment Analysis"
+                                className="max-w-full h-auto rounded-lg shadow-md"
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {dailyData.charts.participation?.base64 && (
+                          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
+                            <h4 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
+                              <FaUsers className="text-blue-600" />
+                              <span>Student Participation Rate</span>
+                            </h4>
+                            <div className="flex justify-center">
+                              <img 
+                                src={dailyData.charts.participation.base64} 
+                                alt="Participation Rate"
+                                className="max-w-full h-auto rounded-lg shadow-md"
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {dailyData.charts.wordcloud?.base64 && (
+                          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
+                            <h4 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
+                              <FaComments className="text-pink-600" />
+                              <span>Comment Word Cloud</span>
+                            </h4>
+                            <div className="flex justify-center">
+                              <img 
+                                src={dailyData.charts.wordcloud.base64} 
+                                alt="Word Cloud"
+                                className="max-w-full h-auto rounded-lg shadow-md"
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Interactive Charts */}
+                  <div className="mt-8 pt-8 border-t border-gray-200">
                     <div className="mb-6">
-                      <h3 className="text-2xl font-bold text-gray-900 mb-2">Visual Analysis</h3>
-                      <p className="text-gray-600">Comprehensive insights through interactive charts</p>
+                      <h3 className="text-2xl font-bold text-gray-900 mb-2">Interactive Charts</h3>
+                      <p className="text-gray-600">Chart.js powered interactive visualizations</p>
                     </div>
                     
-                    {/* 1. Average Rating per Meal (Pie Chart) & 2. Student Rating per Meal (Bar Chart) */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                      <div className="animate-fadeIn">
-                        <AverageRatingPerMealChart 
-                          data={dailyData.averageRatingPerMeal || {}}
-                          title="Average Rating per Meal"
-                        />
-                      </div>
-                      
-                      <div className="animate-fadeIn" style={{ animationDelay: '0.1s' }}>
-                        <StudentRatingPerMealChart 
-                          data={dailyData.studentRatingPerMeal || {}}
-                          title="Student Participation per Meal"
-                        />
-                      </div>
+                      <AverageRatingPerMealChart 
+                        data={dailyData.averageRatingPerMeal || {}}
+                        title="Average Rating per Meal"
+                      />
+                      <StudentRatingPerMealChart 
+                        data={dailyData.studentRatingPerMeal || {}}
+                        title="Student Participation per Meal"
+                      />
                     </div>
 
-                    {/* 3. Feedback Distribution per Meal (Bar Charts) */}
-                    <div className="mb-8">
-                      <h4 className="text-xl font-bold text-gray-900 mb-4">Rating Distribution by Meal</h4>
-                      {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                        {Object.keys(dailyData.feedbackDistributionPerMeal || {}).map((meal, index) => (
-                          <div key={meal} className="animate-fadeIn" style={{ animationDelay: `${0.1 * index}s` }}>
-                            <FeedbackDistributionChart 
-                              data={dailyData.feedbackDistributionPerMeal}
-                              mealName={meal}
-                            />
-                          </div>
-                        ))}
-                      </div> */}
-                      
-                      {/* Combined Distribution Chart */}
-                      <div className="animate-fadeIn" style={{ animationDelay: '0.4s' }}>
-                        <AllMealsFeedbackDistributionChart 
-                          data={dailyData.feedbackDistributionPerMeal || {}}
-                        />
-                      </div>
-                    </div>
+                    <AllMealsFeedbackDistributionChart 
+                      data={dailyData.feedbackDistributionPerMeal || {}}
+                    />
+                  </div>
 
-                    {/* 4. Sentiment Analysis per Meal */}
-                    <div className="mb-8">
-                      <h4 className="text-xl font-bold text-gray-900 mb-4">Sentiment Analysis per Meal</h4>
-                      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
-                        {Object.keys(dailyData.sentimentAnalysisPerMeal || {}).map((meal, index) => (
-                          <div key={meal} className="animate-fadeIn" style={{ animationDelay: `${0.1 * index}s` }}>
-                            <SentimentScoreChart 
-                              data={dailyData.sentimentAnalysisPerMeal}
-                              mealName={meal}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                      
-                      {/* Detailed Sentiment Information */}
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-                        {Object.entries(dailyData.sentimentAnalysisPerMeal || {}).map(([meal, data], index) => {
-                          // Determine status based on average rating
+                  {/* Sentiment Details */}
+                  {dailyData.sentimentAnalysisPerMeal && (
+                    <div className="mt-8">
+                      <h4 className="text-xl font-bold text-gray-900 mb-6">Detailed Sentiment Analysis</h4>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {Object.entries(dailyData.sentimentAnalysisPerMeal).map(([meal, data]) => {
                           const avgRating = data.average_rating || 0;
-                          const negativePercentage = data.sentiment_distribution?.negative?.percentage || 0;
-                          
-                          let statusIcon = '🟢';
-                          let statusText = 'Performing Well';
-                          let statusColor = 'green';
-                          let cardBorder = 'border-green-200';
-                          let cardBg = 'bg-green-50';
-                          
-                          if (avgRating < 2.5 || negativePercentage >= 50) {
-                            statusIcon = '🔴';
-                            statusText = 'Urgent Action Required';
-                            statusColor = 'red';
-                            cardBorder = 'border-red-300';
-                            cardBg = 'bg-red-50';
-                          } else if (avgRating < 3.5 || negativePercentage >= 30) {
-                            statusIcon = '🟡';
-                            statusText = 'Needs Attention';
-                            statusColor = 'yellow';
-                            cardBorder = 'border-yellow-300';
-                            cardBg = 'bg-yellow-50';
-                          }
-                          
+                          const statusIcon = avgRating >= 4 ? '🟢' : avgRating >= 3 ? '🟡' : '🔴';
+                          const statusText = avgRating >= 4 ? 'Performing Well' : avgRating >= 3 ? 'Needs Attention' : 'Urgent Action Required';
+                          const statusColor = avgRating >= 4 ? 'green' : avgRating >= 3 ? 'yellow' : 'red';
+
                           return (
-                          <div key={meal} className={`bg-white rounded-xl p-6 shadow-md border-2 ${cardBorder} ${cardBg} bg-opacity-30`}>
-                            <div className="flex items-start justify-between mb-4">
-                              <h5 className="font-bold text-lg text-gray-900 flex items-center space-x-2">
-                                {getMealIcon(meal.toLowerCase())}
-                                <span>{meal}</span>
-                              </h5>
-                              <div className="flex flex-col items-end">
-                                <span className="text-2xl mb-1">{statusIcon}</span>
-                                <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                                  statusColor === 'green' ? 'bg-green-100 text-green-800' :
-                                  statusColor === 'red' ? 'bg-red-100 text-red-800' :
-                                  'bg-yellow-100 text-yellow-800'
-                                }`}>
-                                  {statusText}
-                                </span>
-                              </div>
-                            </div>
-                            
-                            <div className="space-y-4">
-                              <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-600">Average Rating:</span>
-                                <span className="font-bold text-lg">{data.average_rating}/5.0</span>
+                            <div key={meal} className={`bg-white rounded-xl p-6 shadow-md border-2 border-${statusColor}-200`}>
+                              <div className="flex items-start justify-between mb-4">
+                                <h5 className="font-bold text-lg text-gray-900 flex items-center space-x-2">
+                                  {getMealIcon(meal.toLowerCase())}
+                                  <span>{meal}</span>
+                                </h5>
+                                <div className="flex flex-col items-end">
+                                  <span className="text-2xl mb-1">{statusIcon}</span>
+                                  <span className={`px-3 py-1 rounded-full text-xs font-bold bg-${statusColor}-100 text-${statusColor}-800`}>
+                                    {statusText}
+                                  </span>
+                                </div>
                               </div>
                               
-                              <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-600">Total Responses:</span>
-                                <span className="font-medium">{data.total_responses}</span>
-                              </div>
+                              <div className="space-y-4">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-sm text-gray-600">Average Rating:</span>
+                                  <span className="font-bold text-lg">{data.average_rating}/5.0</span>
+                                </div>
+                                
+                                <div className="flex justify-between items-center">
+                                  <span className="text-sm text-gray-600">Total Responses:</span>
+                                  <span className="font-medium">{data.total_responses}</span>
+                                </div>
 
-                              {/* Sentiment Distribution */}
-                              {/* {data.sentiment_distribution && (
-                                <div className="bg-gray-50 p-4 rounded-lg">
-                                  <h6 className="font-medium text-gray-900 mb-3">Sentiment Breakdown:</h6>
-                                  <div className="space-y-2">
-                                    <div className="flex justify-between items-center">
-                                      <span className="text-sm text-green-600 flex items-center">
-                                        <FaThumbsUp className="mr-1" /> Positive
-                                      </span>
-                                      <span className="font-medium text-green-700">
-                                        {data.sentiment_distribution.positive.count} ({data.sentiment_distribution.positive.percentage}%)
-                                      </span>
-                                    </div>
-                                    <div className="flex justify-between items-center">
-                                      <span className="text-sm text-red-600 flex items-center">
-                                        <FaThumbsDown className="mr-1" /> Negative
-                                      </span>
-                                      <span className="font-medium text-red-700">
-                                        {data.sentiment_distribution.negative.count} ({data.sentiment_distribution.negative.percentage}%)
-                                      </span>
-                                    </div>
-                                    <div className="flex justify-between items-center">
-                                      <span className="text-sm text-gray-600 flex items-center">
-                                        <FaExclamationCircle className="mr-1" /> Neutral
-                                      </span>
-                                      <span className="font-medium text-gray-700">
-                                        {data.sentiment_distribution.neutral.count} ({data.sentiment_distribution.neutral.percentage}%)
-                                      </span>
-                                    </div>
+                                {data.improvement_areas && data.improvement_areas.length > 0 ? (
+                                  <div>
+                                    <p className="text-sm font-semibold text-red-700 mb-3 flex items-center">
+                                      <FaExclamationTriangle className="mr-2" /> 
+                                      Action Required ({data.improvement_areas.length} issues)
+                                    </p>
+                                    <ul className="text-sm space-y-2">
+                                      {data.improvement_areas.slice(0, 3).map((comment, i) => (
+                                        <li key={i} className="flex items-start space-x-2 bg-red-50 p-3 rounded-lg border-l-4 border-red-500">
+                                          <span className="text-red-600 font-bold text-xs mt-0.5">#{i + 1}</span>
+                                          <span className="text-gray-800 flex-1">&quot;{comment}&quot;</span>
+                                        </li>
+                                      ))}
+                                    </ul>
                                   </div>
-                                </div>
-                              )} */}
-
-                              {/* Admin Action Items - Only show negative feedback */}
-                              {data.improvement_areas && data.improvement_areas.length > 0 ? (
-                                <div>
-                                  <p className="text-sm font-semibold text-red-700 mb-3 flex items-center">
-                                    <FaExclamationTriangle className="mr-2" /> 
-                                    Admin Action Required ({data.improvement_areas.length} issues)
-                                  </p>
-                                  <ul className="text-sm space-y-2">
-                                    {data.improvement_areas.slice(0, 3).map((comment, i) => (
-                                      <li key={i} className="flex items-start space-x-2 bg-red-50 p-3 rounded-lg border-l-4 border-red-500">
-                                        <span className="text-red-600 font-bold text-xs mt-0.5">#{i + 1}</span>
-                                        <span className="text-gray-800 flex-1">"{comment}"</span>
-                                      </li>
-                                    ))}
-                                    {data.improvement_areas.length > 3 && (
-                                      <li className="text-xs text-gray-500 italic pl-6">
-                                        +{data.improvement_areas.length - 3} more complaints - review all feedback
-                                      </li>
-                                    )}
-                                  </ul>
-                                </div>
-                              ) : (
-                                <div className="bg-green-50 p-3 rounded-lg border-l-4 border-green-500">
-                                  <p className="text-sm font-medium text-green-700 flex items-center">
-                                    <FaCheckCircle className="mr-2" />
-                                    No negative feedback - Continue current standards
-                                  </p>
-                                </div>
-                              )}
+                                ) : (
+                                  <div className="bg-green-50 p-3 rounded-lg border-l-4 border-green-500">
+                                    <p className="text-sm font-medium text-green-700 flex items-center">
+                                      <FaCheckCircle className="mr-2" />
+                                      No negative feedback
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        );
+                          );
                         })}
                       </div>
                     </div>
+                  )}
 
-                    {/* 5. Enhanced Overall Summary - Priority Action Dashboard */}
-                    {dailyData.overallSummary && (
-                      <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 rounded-2xl p-8 border-2 border-indigo-200 shadow-lg">
-                        <div className="flex items-center justify-between mb-6">
-                          <h4 className="text-2xl font-bold text-gray-900 flex items-center space-x-3">
-                            <FaChartLine className="text-indigo-600 text-2xl" />
-                            <span>Daily Action Dashboard</span>
-                          </h4>
-                          <div className="text-xs text-gray-500">
-                            {new Date().toLocaleDateString('en-US', { 
-                              weekday: 'long', 
-                              month: 'long', 
-                              day: 'numeric',
-                              year: 'numeric'
-                            })}
-                          </div>
+                  {/* Overall Summary */}
+                  {dailyData.overallSummary && (
+                    <div className="mt-8 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 rounded-2xl p-8 border-2 border-indigo-200 shadow-lg">
+                      <h4 className="text-2xl font-bold text-gray-900 mb-6 flex items-center space-x-3">
+                        <FaChartLine className="text-indigo-600" />
+                        <span>Daily Action Dashboard</span>
+                      </h4>
+
+                      {dailyData.overallSummary.performance_summary && (
+                        <div className="bg-white rounded-xl p-4 mb-6 border-l-4 border-indigo-500 shadow-sm">
+                          <p className="text-gray-700 text-sm font-mono">{dailyData.overallSummary.performance_summary}</p>
                         </div>
+                      )}
 
-                        {/* Performance Summary Banner */}
-                        {dailyData.overallSummary.performance_summary && (
-                          <div className="bg-white rounded-xl p-4 mb-6 border-l-4 border-indigo-500 shadow-sm">
-                            <h5 className="font-bold text-gray-900 mb-2 flex items-center">
-                              <FaCheckCircle className="text-indigo-500 mr-2" />
-                              Overall Status
+                      <div className="space-y-6">
+                        {dailyData.overallSummary.key_insights && dailyData.overallSummary.key_insights.length > 0 && (
+                          <div className="bg-white rounded-xl p-6 shadow-md border-l-4 border-blue-500">
+                            <h5 className="font-bold text-lg text-gray-900 mb-4 flex items-center space-x-2">
+                              <FaLightbulb className="text-blue-500" />
+                              <span>Key Insights</span>
                             </h5>
-                            <p className="text-gray-700 text-sm font-mono">{dailyData.overallSummary.performance_summary}</p>
+                            <div className="space-y-3">
+                              {dailyData.overallSummary.key_insights.map((insight, index) => (
+                                <div key={index} className="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
+                                  <span className="flex items-center justify-center w-7 h-7 bg-blue-500 text-white text-sm font-bold rounded-full">
+                                    {index + 1}
+                                  </span>
+                                  <p className="text-sm font-medium text-gray-800 pt-1">{insight}</p>
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         )}
-                        
-                        <div className="space-y-6">
-                          {/* Priority Actions - Focus on what needs fixing */}
-                          {/* {dailyData.overallSummary.critical_actions && dailyData.overallSummary.critical_actions.length > 0 && (
-                            <div className="bg-white rounded-xl p-6 shadow-md border-l-4 border-red-500">
-                              <h5 className="font-bold text-lg text-gray-900 mb-4 flex items-center space-x-2">
-                                <FaExclamationTriangle className="text-red-500 text-xl" />
-                                <span>🎯 Priority Actions (Do These First)</span>
-                              </h5>
-                              <div className="space-y-3">
-                                {dailyData.overallSummary.critical_actions.slice(0, 3).map((action, index) => {
-                                  // Determine priority based on position
-                                  const priorityIcon = index === 0 ? '🔴' : index === 1 ? '🟡' : '🟢';
-                                  const priorityLabel = index === 0 ? 'CRITICAL' : index === 1 ? 'HIGH' : 'MEDIUM';
-                                  const priorityColor = index === 0 ? 'red' : index === 1 ? 'yellow' : 'green';
-                                  
-                                  return (
-                                    <div key={index} className={`flex items-start space-x-3 p-4 rounded-lg border-2 ${
-                                      priorityColor === 'red' ? 'bg-red-50 border-red-200' :
-                                      priorityColor === 'yellow' ? 'bg-yellow-50 border-yellow-200' :
-                                      'bg-green-50 border-green-200'
-                                    }`}>
-                                      <div className="flex-shrink-0 flex flex-col items-center">
-                                        <span className="text-2xl mb-1">{priorityIcon}</span>
-                                        <span className={`text-xs font-bold px-2 py-1 rounded ${
-                                          priorityColor === 'red' ? 'bg-red-200 text-red-800' :
-                                          priorityColor === 'yellow' ? 'bg-yellow-200 text-yellow-800' :
-                                          'bg-green-200 text-green-800'
-                                        }`}>
-                                          {priorityLabel}
-                                        </span>
-                                      </div>
-                                      <div className="flex-1">
-                                        <div className="flex items-center space-x-2 mb-2">
-                                          <span className="font-bold text-gray-900">Action {index + 1}:</span>
-                                        </div>
-                                        <p className="text-sm text-gray-800 font-medium leading-relaxed">{action}</p>
-                                        <div className="mt-2 flex items-center space-x-4 text-xs text-gray-600">
-                                          <span className="flex items-center">
-                                            <FaClock className="mr-1" />
-                                            Deadline: {index === 0 ? 'Today' : index === 1 ? '2 days' : 'This week'}
-                                          </span>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          )} */}
-                          
-                          {/* Key Focus Areas - Simplified to 2-3 points */}
-                          {dailyData.overallSummary.key_insights && dailyData.overallSummary.key_insights.length > 0 && (
-                            <div className="bg-white rounded-xl p-6 shadow-md border-l-4 border-blue-500">
-                              <h5 className="font-bold text-lg text-gray-900 mb-4 flex items-center space-x-2">
-                                <FaLightbulb className="text-blue-500 text-xl" />
-                                <span>📊 Key Insights (What's Happening)</span>
-                              </h5>
-                              <div className="space-y-3">
-                                {dailyData.overallSummary.key_insights.slice(0, 3).map((insight, index) => (
-                                  <div key={index} className="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
-                                    <div className="flex-shrink-0">
-                                      <span className="flex items-center justify-center w-7 h-7 bg-blue-500 text-white text-sm font-bold rounded-full">
-                                        {index + 1}
-                                      </span>
-                                    </div>
-                                    <p className="text-sm font-medium text-gray-800 pt-1">{insight}</p>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
 
-                          {/* Show "All Good" message if no critical actions */}
-                          {(!dailyData.overallSummary.critical_actions || dailyData.overallSummary.critical_actions.length === 0) && (
-                            <div className="bg-white rounded-xl p-6 shadow-md border-l-4 border-green-500">
-                              <div className="text-center py-4">
-                                <FaCheckCircle className="text-5xl text-green-500 mx-auto mb-3" />
-                                <h5 className="font-bold text-xl text-green-800 mb-2">All Systems Good! 🎉</h5>
-                                <p className="text-gray-700">No critical issues detected. Continue maintaining quality standards.</p>
-                              </div>
+                        {dailyData.overallSummary.critical_actions && dailyData.overallSummary.critical_actions.length > 0 && (
+                          <div className="bg-white rounded-xl p-6 shadow-md border-l-4 border-red-500">
+                            <h5 className="font-bold text-lg text-gray-900 mb-4 flex items-center space-x-2">
+                              <FaExclamationTriangle className="text-red-500" />
+                              <span>Priority Actions</span>
+                            </h5>
+                            <div className="space-y-3">
+                              {dailyData.overallSummary.critical_actions.map((action, index) => (
+                                <div key={index} className="flex items-start space-x-3 p-4 bg-red-50 rounded-lg border-2 border-red-200">
+                                  <span className="text-2xl">{index === 0 ? '🔴' : '🟡'}</span>
+                                  <p className="text-sm text-gray-800 font-medium">{action}</p>
+                                </div>
+                              ))}
                             </div>
-                          )}
-                        </div>
-
-                        {/* Legacy Support - Show old format if new format not available */}
-                        {(!dailyData.overallSummary.key_insights && dailyData.overallSummary.overall_feedback) && (
-                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-                            {/* Overall Feedback (Legacy) */}
-                            <div className="bg-white rounded-xl p-6 shadow-sm">
-                              <h5 className="font-bold text-lg text-gray-900 mb-3 flex items-center space-x-2">
-                                <FaComments className="text-blue-500" />
-                                <span>Overall Feedback</span>
-                              </h5>
-                              <p className="text-gray-700">{dailyData.overallSummary.overall_feedback}</p>
-                            </div>
-                            
-                            {/* Common Issues (Legacy) */}
-                            <div className="bg-white rounded-xl p-6 shadow-sm">
-                              <h5 className="font-bold text-lg text-gray-900 mb-3 flex items-center space-x-2">
-                                <FaExclamationTriangle className="text-red-500" />
-                                <span>Common Issues</span>
-                              </h5>
-                              {dailyData.overallSummary.common_issues && dailyData.overallSummary.common_issues.length > 0 ? (
-                                <ul className="space-y-2">
-                                  {dailyData.overallSummary.common_issues.map((issue, index) => (
-                                    <li key={index} className="text-sm text-gray-700 flex items-start space-x-2">
-                                      <span className="text-red-500 mt-1">•</span>
-                                      <span>{issue}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              ) : (
-                                <p className="text-gray-500 text-sm">No major issues identified today!</p>
-                              )}
-                            </div>
-                            
-                            {/* Positive Highlights (Legacy) */}
-                            {dailyData.overallSummary.positive_highlights && dailyData.overallSummary.positive_highlights.length > 0 && (
-                              <div className="bg-white rounded-xl p-6 shadow-sm">
-                                <h5 className="font-bold text-lg text-gray-900 mb-3 flex items-center space-x-2">
-                                  <FaThumbsUp className="text-green-500" />
-                                  <span>Positive Highlights</span>
-                                </h5>
-                                <ul className="space-y-2">
-                                  {dailyData.overallSummary.positive_highlights.map((highlight, index) => (
-                                    <li key={index} className="text-sm text-gray-700 flex items-start space-x-2">
-                                      <span className="text-green-500 mt-1">•</span>
-                                      <span>{highlight}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                            
-                            {/* Recommendations (Legacy) */}
-                            {dailyData.overallSummary.recommendations && dailyData.overallSummary.recommendations.length > 0 && (
-                              <div className="bg-white rounded-xl p-6 shadow-sm">
-                                <h5 className="font-bold text-lg text-gray-900 mb-3 flex items-center space-x-2">
-                                  <FaLightbulb className="text-yellow-500" />
-                                  <span>Recommendations</span>
-                                </h5>
-                                <ul className="space-y-2">
-                                  {dailyData.overallSummary.recommendations.map((rec, index) => (
-                                    <li key={index} className="text-sm text-gray-700 flex items-start space-x-2">
-                                      <span className="text-yellow-500 mt-1">•</span>
-                                      <span>{rec}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
                           </div>
                         )}
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </>
               )}
 
               {/* Error State */}
               {!dailyData && (
                 <div className="bg-red-50 border border-red-200 rounded-2xl p-8 text-center">
-                  <div className="flex items-center justify-center mb-4">
-                    <div className="p-4 bg-red-100 rounded-full">
-                      <FaExclamationCircle className="text-red-600 text-2xl" />
-                    </div>
-                  </div>
+                  <FaExclamationCircle className="text-red-600 text-4xl mx-auto mb-4" />
                   <h3 className="text-xl font-bold text-red-800 mb-2">Error Loading Data</h3>
-                  <p className="text-red-700">Unable to load daily analysis. Please try again or select a different date.</p>
+                  <p className="text-red-700 mb-4">Unable to load daily analysis.</p>
                   <button 
-                    onClick={fetchDailyData}
-                    className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                    onClick={handleAnalyzeClick}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                   >
                     Retry
                   </button>

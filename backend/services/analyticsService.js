@@ -10,7 +10,8 @@ const __dirname = path.dirname(__filename);
 class AnalyticsService {
   constructor() {
     this.analyticsPath = path.join(__dirname, '../../analytics-service');
-    this.pythonExecutable = 'python3'; // or 'python' depending on system
+    // Use virtual environment Python
+    this.pythonExecutable = path.join(this.analyticsPath, 'venv', 'bin', 'python');
   }
 
   /**
