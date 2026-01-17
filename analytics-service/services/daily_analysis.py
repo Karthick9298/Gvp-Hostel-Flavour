@@ -204,6 +204,7 @@ def analyze_daily_feedback(date_str):
         rating_distribution = {meal: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0} for meal in meal_types}
         
         all_ratings = []
+        all_comments = []  # Collect all comments with metadata for NLP sentiment analysis
         participating_students = 0
         
         # Process feedback data
@@ -223,6 +224,12 @@ def analyze_daily_feedback(date_str):
                     
                     if comment and comment.strip():
                         meal_comments[meal_type].append(comment.strip())
+                        # Collect comment with metadata for sentiment analysis
+                        all_comments.append({
+                            'text': comment.strip(),
+                            'meal': meal_names[meal_type],
+                            'rating': rating
+                        })
             
             if user_has_feedback:
                 participating_students += 1
@@ -328,7 +335,8 @@ def analyze_daily_feedback(date_str):
             "averageRatingPerMeal": average_ratings_per_meal,
             "studentRatingPerMeal": student_rating_per_meal,
             "feedbackDistributionPerMeal": feedback_distribution_per_meal,
-            "sentimentAnalysisPerMeal": sentiment_analysis_per_meal
+            "sentimentAnalysisPerMeal": sentiment_analysis_per_meal,
+            "allComments": all_comments  # Add for NLP sentiment analysis in charts
         }
         
         # Generate charts

@@ -413,11 +413,11 @@ const DailyAnalysisDashboard = () => {
                           </div>
                         )}
 
-                        {/* {dailyData.charts.sentiment?.base64 && (
+                        {dailyData.charts.sentiment?.base64 && (
                           <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
                             <h4 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
                               <FaComments className="text-green-600" />
-                              <span>Sentiment Analysis per Meal</span>
+                              <span>Sentiment Analysis (NLP-Based)</span>
                             </h4>
                             <div className="flex justify-center">
                               <img 
@@ -426,8 +426,51 @@ const DailyAnalysisDashboard = () => {
                                 className="max-w-full h-auto rounded-lg shadow-md"
                               />
                             </div>
+                            
+                            {/* Display Top Comments if available */}
+                            {dailyData.charts.sentiment.topComments && (
+                              <div className="mt-6 grid md:grid-cols-2 gap-6">
+                                {/* Positive Comments */}
+                                {dailyData.charts.sentiment.topComments.positive?.length > 0 && (
+                                  <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                                    <h5 className="font-bold text-green-800 mb-3 flex items-center">
+                                      <span className="mr-2">✅</span> Top Positive Comments
+                                    </h5>
+                                    <div className="space-y-3">
+                                      {dailyData.charts.sentiment.topComments.positive.map((comment, idx) => (
+                                        <div key={idx} className="bg-white rounded p-3 shadow-sm">
+                                          <p className="text-sm text-gray-700 mb-1">"{comment.text}"</p>
+                                          <p className="text-xs text-gray-500">
+                                            {comment.meal} • {comment.rating}★
+                                          </p>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                                
+                                {/* Negative Comments */}
+                                {dailyData.charts.sentiment.topComments.negative?.length > 0 && (
+                                  <div className="bg-red-50 rounded-lg p-4 border border-red-200">
+                                    <h5 className="font-bold text-red-800 mb-3 flex items-center">
+                                      <span className="mr-2">❌</span> Top Concerns
+                                    </h5>
+                                    <div className="space-y-3">
+                                      {dailyData.charts.sentiment.topComments.negative.map((comment, idx) => (
+                                        <div key={idx} className="bg-white rounded p-3 shadow-sm">
+                                          <p className="text-sm text-gray-700 mb-1">"{comment.text}"</p>
+                                          <p className="text-xs text-gray-500">
+                                            {comment.meal} • {comment.rating}★
+                                          </p>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
                           </div>
-                        )} */}
+                        )}
 
                         {dailyData.charts.participation?.base64 && (
                           <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
@@ -463,111 +506,6 @@ const DailyAnalysisDashboard = () => {
                       </div>
                     </div>
                   )}
-
-                  {/* Interactive Charts */}
-                  {/* <div className="mt-8 pt-8 border-t border-gray-200">
-                    <div className="mb-6">
-                      <h3 className="text-2xl font-bold text-gray-900 mb-2">Interactive Charts</h3>
-                      <p className="text-gray-600">Chart.js powered interactive visualizations</p>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                      <AverageRatingPerMealChart 
-                        data={dailyData.averageRatingPerMeal || {}}
-                        title="Average Rating per Meal"
-                      />
-                      <StudentRatingPerMealChart 
-                        data={dailyData.studentRatingPerMeal || {}}
-                        title="Student Participation per Meal"
-                      />
-                    </div>
-
-                    <AllMealsFeedbackDistributionChart 
-                      data={dailyData.feedbackDistributionPerMeal || {}}
-                    />
-                  </div> */}
-
-                  {/* Sentiment Details
-                  {dailyData.sentimentAnalysisPerMeal && (
-                    <div className="mt-8">
-                      <h4 className="text-xl font-bold text-gray-900 mb-6">Meal-wise Sentiment Analysis</h4>
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {Object.entries(dailyData.sentimentAnalysisPerMeal).map(([meal, data]) => {
-                          const avgRating = data.average_rating || 0;
-                          const statusIcon = avgRating >= 4 ? '🟢' : avgRating >= 3 ? '🟡' : '🔴';
-                          const statusText = avgRating >= 4 ? 'Performing Well' : avgRating >= 3 ? 'Needs Attention' : 'Urgent Action Required';
-                          const statusColor = avgRating >= 4 ? 'green' : avgRating >= 3 ? 'yellow' : 'red';
-
-                          return (
-                            <div key={meal} className={`bg-white rounded-xl p-6 shadow-md border-2 border-${statusColor}-200`}>
-                              <div className="flex items-start justify-between mb-4">
-                                <h5 className="font-bold text-lg text-gray-900 flex items-center space-x-2">
-                                  {getMealIcon(meal.toLowerCase())}
-                                  <span>{meal}</span>
-                                </h5>
-                                <div className="flex flex-col items-end">
-                                  <span className="text-2xl mb-1">{statusIcon}</span>
-                                  <span className={`px-3 py-1 rounded-full text-xs font-bold bg-${statusColor}-100 text-${statusColor}-800`}>
-                                    {statusText}
-                                  </span>
-                                </div>
-                              </div>
-                              
-                              <div className="space-y-4">
-                                <div className="flex justify-between items-center">
-                                  <span className="text-sm text-gray-600">Average Rating:</span>
-                                  <span className="font-bold text-lg">{data.average_rating}/5.0</span>
-                                </div>
-                                
-                                <div className="flex justify-between items-center">
-                                  <span className="text-sm text-gray-600">Total Responses:</span>
-                                  <span className="font-medium">{data.total_responses}</span>
-                                </div>
-
-                                <div className="flex justify-between items-center">
-                                  <span className="text-sm text-gray-600">Sentiment:</span>
-                                  <div className="text-right">
-                                    <div className="text-sm font-medium text-green-700">
-                                      👍 {data.positive_percentage}% positive
-                                    </div>
-                                    <div className="text-sm font-medium text-red-700">
-                                      👎 {data.negative_percentage}% negative
-                                    </div>
-                                  </div>
-                                </div>
-
-                                {data.improvement_areas && data.improvement_areas.length > 0 ? (
-                                  <div>
-                                    <p className="text-sm font-semibold text-red-700 mb-3 flex items-center">
-                                      <FaExclamationTriangle className="mr-2" /> 
-                                      Action Required ({data.improvement_areas.length} issues)
-                                    </p>
-                                    <ul className="text-sm space-y-2">
-                                      {data.improvement_areas.slice(0, 3).map((comment, i) => (
-                                        <li key={i} className="flex items-start space-x-2 bg-red-50 p-3 rounded-lg border-l-4 border-red-500">
-                                          <span className="text-red-600 font-bold text-xs mt-0.5">#{i + 1}</span>
-                                          <span className="text-gray-800 flex-1">&quot;{comment}&quot;</span>
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  </div>
-                                ) : (
-                                  <div className="bg-green-50 p-3 rounded-lg border-l-4 border-green-500">
-                                    <p className="text-sm font-medium text-green-700 flex items-center">
-                                      <FaCheckCircle className="mr-2" />
-                                      No negative feedback
-                                    </p>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )} */}
-
-                  {/* Remove the old overall summary section as it's replaced by dailySummary */}
                 </>
               )}
             </div>
