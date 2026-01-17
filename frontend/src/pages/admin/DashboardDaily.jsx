@@ -1,10 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import {
-  AverageRatingPerMealChart,
-  StudentRatingPerMealChart,
-  AllMealsFeedbackDistributionChart
-} from '../../components/charts/DailyAnalysisCharts';
 import { 
   FaChartBar, 
   FaUsers, 
@@ -32,6 +27,21 @@ const DailyAnalysisDashboard = () => {
     return yesterday.toISOString().split('T')[0];
   });
 
+  // DEBUG: Log whenever dailyData changes
+  useEffect(() => {
+    if (dailyData) {
+      console.log('=== DAILY DATA STATE UPDATED ===');
+      console.log('Has charts in state:', 'charts' in dailyData);
+      if (dailyData.charts) {
+        console.log('Charts keys in state:', Object.keys(dailyData.charts));
+        console.log('avgRatings exists:', !!dailyData.charts.avgRatings);
+        console.log('avgRatings.base64 exists:', !!dailyData.charts.avgRatings?.base64);
+      } else {
+        console.log('❌ NO CHARTS IN STATE!');
+      }
+    }
+  }, [dailyData]);
+
   const handleAnalyzeClick = async () => {
     if (!selectedDate) {
       toast.error('Please select a date');
@@ -41,15 +51,35 @@ const DailyAnalysisDashboard = () => {
     try {
       setLoading(true);
       setDailyData(null);
-      const response = await fetch(`http://localhost:5000/api/analytics/daily/${selectedDate}`, {
+      const apiBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/+$/, '');
+      const response = await fetch(`${apiBaseUrl}/analytics/daily/${selectedDate}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('firebaseToken')}`
         }
       });
       const data = await response.json();
       
+      // DEBUG: Log complete response
+      console.log('=== API RESPONSE DEBUG ===');
+      console.log('Response keys:', Object.keys(data));
+      console.log('Has charts in response:', 'charts' in data);
+      if (data.charts) {
+        console.log('Charts keys:', Object.keys(data.charts));
+        console.log('avgRatings has base64:', data.charts.avgRatings?.base64?.substring(0, 50));
+      } else {
+        console.log('❌ NO CHARTS IN RESPONSE!');
+      }
+      
       if (data.status === 'success') {
-        setDailyData(data.data);
+        // Include charts from response along with data
+        const mergedData = {
+          ...data.data,
+          charts: data.charts
+        };
+        console.log('=== SETTING STATE ===');
+        console.log('Has charts in merged data:', 'charts' in mergedData);
+        console.log('Charts keys in merged data:', mergedData.charts ? Object.keys(mergedData.charts) : 'NO CHARTS');
+        setDailyData(mergedData);
       } else if (data.status === 'no_data') {
         setDailyData({
           type: data.type,
@@ -85,15 +115,44 @@ const DailyAnalysisDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="mb-4">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full shadow-lg">
-              <FaChartBar className="text-2xl text-indigo-600 animate-pulse" />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white relative overflow-hidden">
+          <div className="absolute inset-0 bg-black bg-opacity-10"></div>
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="flex items-center justify-between animate-fadeIn">
+              <div className="flex items-center space-x-6">
+                <div className="p-4 bg-white bg-opacity-20 rounded-2xl shadow-lg backdrop-blur-sm">
+                  <FaChartBar className="text-4xl animate-pulse" />
+                </div>
+                <div>
+                  <h1 className="text-4xl font-bold">Daily Analysis Dashboard</h1>
+                  <p className="text-indigo-100 mt-2">Hostel Food Feedback & Insights</p>
+                </div>
+              </div>
             </div>
           </div>
-          <LoadingSpinner text="Loading daily analysis..." />
-          <p className="text-sm text-gray-600 mt-2">Analyzing feedback data...</p>
+        </div>
+
+        {/* Loading Content */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-16">
+            <div className="flex flex-col items-center justify-center space-y-6">
+              <div className="relative">
+                <div className="w-24 h-24 border-8 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+                <FaChartBar className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl text-indigo-600" />
+              </div>
+              <div className="text-center">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Analyzing Data...</h3>
+                <p className="text-gray-600">Generating insights and visualizations for {selectedDate}</p>
+                <div className="mt-4 flex items-center justify-center space-x-2">
+                  <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+                  <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+                  <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -208,8 +267,21 @@ const DailyAnalysisDashboard = () => {
               {/* Success Data Display */}
               {dailyData && !dailyData.type && (
                 <>
+                  {/* Daily Summary Section */}
+                  {dailyData.dailySummary && (
+                    <div className="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border-2 border-indigo-200 shadow-lg">
+                      <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
+                        <FaLightbulb className="text-indigo-600" />
+                        <span>Daily Summary</span>
+                      </h3>
+                      <p className="text-gray-800 leading-relaxed text-base">
+                        {dailyData.dailySummary}
+                      </p>
+                    </div>
+                  )}
+
                   {/* Overview Cards */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <div className="bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 text-white rounded-2xl p-8 shadow-xl relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-24 h-24 bg-white bg-opacity-10 rounded-full -mr-12 -mt-12"></div>
                       <div className="relative">
@@ -246,6 +318,28 @@ const DailyAnalysisDashboard = () => {
                             className="bg-white h-2 rounded-full transition-all duration-1000"
                             style={{ width: `${dailyData.overview?.participationRate || 0}%` }}
                           ></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 text-white rounded-2xl p-8 shadow-xl relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-white bg-opacity-10 rounded-full -mr-12 -mt-12"></div>
+                      <div className="relative">
+                        <div className="flex items-center justify-between mb-4">
+                          <div>
+                            <p className="text-amber-100 text-sm font-medium uppercase tracking-wide">Quality Consistency</p>
+                            <p className="text-4xl font-bold">{dailyData.overview?.qualityConsistencyScore || 0}/100</p>
+                          </div>
+                          <div className="p-3 bg-white bg-opacity-20 rounded-xl">
+                            <FaChartLine className="text-3xl" />
+                          </div>
+                        </div>
+                        <div className="text-amber-100 text-sm">
+                          {(dailyData.overview?.qualityConsistencyScore || 0) >= 70 
+                            ? '🟢 Highly Consistent' 
+                            : (dailyData.overview?.qualityConsistencyScore || 0) >= 40 
+                            ? '🟡 Moderately Consistent' 
+                            : '🔴 Needs Improvement'}
                         </div>
                       </div>
                     </div>
@@ -319,7 +413,7 @@ const DailyAnalysisDashboard = () => {
                           </div>
                         )}
 
-                        {dailyData.charts.sentiment?.base64 && (
+                        {/* {dailyData.charts.sentiment?.base64 && (
                           <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
                             <h4 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
                               <FaComments className="text-green-600" />
@@ -333,7 +427,7 @@ const DailyAnalysisDashboard = () => {
                               />
                             </div>
                           </div>
-                        )}
+                        )} */}
 
                         {dailyData.charts.participation?.base64 && (
                           <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
@@ -371,7 +465,7 @@ const DailyAnalysisDashboard = () => {
                   )}
 
                   {/* Interactive Charts */}
-                  <div className="mt-8 pt-8 border-t border-gray-200">
+                  {/* <div className="mt-8 pt-8 border-t border-gray-200">
                     <div className="mb-6">
                       <h3 className="text-2xl font-bold text-gray-900 mb-2">Interactive Charts</h3>
                       <p className="text-gray-600">Chart.js powered interactive visualizations</p>
@@ -391,12 +485,12 @@ const DailyAnalysisDashboard = () => {
                     <AllMealsFeedbackDistributionChart 
                       data={dailyData.feedbackDistributionPerMeal || {}}
                     />
-                  </div>
+                  </div> */}
 
-                  {/* Sentiment Details */}
+                  {/* Sentiment Details
                   {dailyData.sentimentAnalysisPerMeal && (
                     <div className="mt-8">
-                      <h4 className="text-xl font-bold text-gray-900 mb-6">Detailed Sentiment Analysis</h4>
+                      <h4 className="text-xl font-bold text-gray-900 mb-6">Meal-wise Sentiment Analysis</h4>
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {Object.entries(dailyData.sentimentAnalysisPerMeal).map(([meal, data]) => {
                           const avgRating = data.average_rating || 0;
@@ -430,6 +524,18 @@ const DailyAnalysisDashboard = () => {
                                   <span className="font-medium">{data.total_responses}</span>
                                 </div>
 
+                                <div className="flex justify-between items-center">
+                                  <span className="text-sm text-gray-600">Sentiment:</span>
+                                  <div className="text-right">
+                                    <div className="text-sm font-medium text-green-700">
+                                      👍 {data.positive_percentage}% positive
+                                    </div>
+                                    <div className="text-sm font-medium text-red-700">
+                                      👎 {data.negative_percentage}% negative
+                                    </div>
+                                  </div>
+                                </div>
+
                                 {data.improvement_areas && data.improvement_areas.length > 0 ? (
                                   <div>
                                     <p className="text-sm font-semibold text-red-700 mb-3 flex items-center">
@@ -459,77 +565,10 @@ const DailyAnalysisDashboard = () => {
                         })}
                       </div>
                     </div>
-                  )}
+                  )} */}
 
-                  {/* Overall Summary */}
-                  {dailyData.overallSummary && (
-                    <div className="mt-8 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 rounded-2xl p-8 border-2 border-indigo-200 shadow-lg">
-                      <h4 className="text-2xl font-bold text-gray-900 mb-6 flex items-center space-x-3">
-                        <FaChartLine className="text-indigo-600" />
-                        <span>Daily Action Dashboard</span>
-                      </h4>
-
-                      {dailyData.overallSummary.performance_summary && (
-                        <div className="bg-white rounded-xl p-4 mb-6 border-l-4 border-indigo-500 shadow-sm">
-                          <p className="text-gray-700 text-sm font-mono">{dailyData.overallSummary.performance_summary}</p>
-                        </div>
-                      )}
-
-                      <div className="space-y-6">
-                        {dailyData.overallSummary.key_insights && dailyData.overallSummary.key_insights.length > 0 && (
-                          <div className="bg-white rounded-xl p-6 shadow-md border-l-4 border-blue-500">
-                            <h5 className="font-bold text-lg text-gray-900 mb-4 flex items-center space-x-2">
-                              <FaLightbulb className="text-blue-500" />
-                              <span>Key Insights</span>
-                            </h5>
-                            <div className="space-y-3">
-                              {dailyData.overallSummary.key_insights.map((insight, index) => (
-                                <div key={index} className="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
-                                  <span className="flex items-center justify-center w-7 h-7 bg-blue-500 text-white text-sm font-bold rounded-full">
-                                    {index + 1}
-                                  </span>
-                                  <p className="text-sm font-medium text-gray-800 pt-1">{insight}</p>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {dailyData.overallSummary.critical_actions && dailyData.overallSummary.critical_actions.length > 0 && (
-                          <div className="bg-white rounded-xl p-6 shadow-md border-l-4 border-red-500">
-                            <h5 className="font-bold text-lg text-gray-900 mb-4 flex items-center space-x-2">
-                              <FaExclamationTriangle className="text-red-500" />
-                              <span>Priority Actions</span>
-                            </h5>
-                            <div className="space-y-3">
-                              {dailyData.overallSummary.critical_actions.map((action, index) => (
-                                <div key={index} className="flex items-start space-x-3 p-4 bg-red-50 rounded-lg border-2 border-red-200">
-                                  <span className="text-2xl">{index === 0 ? '🔴' : '🟡'}</span>
-                                  <p className="text-sm text-gray-800 font-medium">{action}</p>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
+                  {/* Remove the old overall summary section as it's replaced by dailySummary */}
                 </>
-              )}
-
-              {/* Error State */}
-              {!dailyData && (
-                <div className="bg-red-50 border border-red-200 rounded-2xl p-8 text-center">
-                  <FaExclamationCircle className="text-red-600 text-4xl mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-red-800 mb-2">Error Loading Data</h3>
-                  <p className="text-red-700 mb-4">Unable to load daily analysis.</p>
-                  <button 
-                    onClick={handleAnalyzeClick}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                  >
-                    Retry
-                  </button>
-                </div>
               )}
             </div>
           </div>

@@ -60,6 +60,8 @@ class DatabaseConnection:
         """Get users collection"""
         return self.db.users
 
+
+# For weekly or more than analysis , we need this 
 def get_date_range(date_str):
     """Get start and end datetime for a specific day"""
     try:
@@ -90,3 +92,4 @@ def handle_error(message, error_type="ERROR"):
         "timestamp": datetime.now().isoformat()
     }
     safe_json_output(error_data)
+

@@ -125,21 +125,29 @@ class ChartGenerator:
         fig, axes = plt.subplots(2, 2, figsize=(14, 12))
         axes = axes.flatten()
         
-        colors = ['#16a34a', '#dc2626', '#6b7280']
+        colors = ['#16a34a', '#dc2626', '#6b7280']  # positive, negative, neutral
         
         for idx, (meal, meal_data) in enumerate(sentiment_data.items()):
             if idx >= 4:
                 break
             
-            sentiment_dist = meal_data.get('sentiment_distribution', {})
+            # Use simplified sentiment structure
+            positive_pct = meal_data.get('positive_percentage', 0)
+            negative_pct = meal_data.get('negative_percentage', 0)
+            neutral_pct = 100 - positive_pct - negative_pct
+            
             labels = []
             sizes = []
             
-            for sentiment in ['positive', 'negative', 'neutral']:
-                count = sentiment_dist.get(sentiment, {}).get('count', 0)
-                if count > 0:
-                    labels.append(sentiment.capitalize())
-                    sizes.append(count)
+            if positive_pct > 0:
+                labels.append('Positive')
+                sizes.append(positive_pct)
+            if negative_pct > 0:
+                labels.append('Negative')
+                sizes.append(negative_pct)
+            if neutral_pct > 0:
+                labels.append('Neutral')
+                sizes.append(neutral_pct)
             
             if sizes:
                 axes[idx].pie(sizes, labels=labels, colors=colors[:len(sizes)], 
