@@ -1,0 +1,145 @@
+# ============================================
+# ROOT .GITIGNORE - Hostel Flavour Project
+# ============================================
+
+# =====================================
+# Node.js & NPM
+# =====================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+package-lock.json.bak
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+coverage/
+.nyc_output/
+
+# =====================================
+# Environment Variables & Secrets
+# =====================================
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+*.local
+
+# Frontend environment files
+frontend/.env
+frontend/.env.local
+frontend/.env.development
+frontend/.env.production
+frontend/.env.test
+
+# Firebase Service Account Keys (CRITICAL - NEVER commit!)
+*firebase*adminsdk*.json
+firebase-service-account.json
+serviceAccount*.json
+*.key
+*.pem
+
+# =====================================
+# Python
+# =====================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# Python build
+*.egg-info/
+dist/
+build/
+
+# =====================================
+# Analytics Service Outputs
+# =====================================
+analytics-service/output/daily/*
+!analytics-service/output/daily/.gitkeep
+
+# =====================================
+# Logs
+# =====================================
+logs/
+*.log
+npm-debug.log*
+
+# =====================================
+# Operating System Files
+# =====================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# =====================================
+# IDE & Editors
+# =====================================
+# VSCode
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# =====================================
+# Miscellaneous
+# =====================================
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Database dumps
+*.sql
+*.sqlite
+*.db
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.rar
