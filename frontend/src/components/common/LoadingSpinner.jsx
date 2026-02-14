@@ -8,9 +8,9 @@ const LoadingSpinner = ({ size = 'md', text = 'Loading...' }) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-navy-950">
       <div className={`spinner ${sizeClasses[size]} mb-4`}></div>
-      <p className="text-gray-600 text-sm">{text}</p>
+      <p className="text-gray-400 text-sm">{text}</p>
     </div>
   );
 };

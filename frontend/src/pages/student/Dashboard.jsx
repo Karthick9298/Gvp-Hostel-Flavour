@@ -230,15 +230,15 @@ const StudentDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-navy-950 via-navy-900 to-primary-950 flex items-center justify-center">
         <div className="text-center">
           <div className="mb-4">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full shadow-lg">
-              <FaUtensils className="text-2xl text-indigo-600 animate-pulse" />
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-navy-800 rounded-full shadow-lg">
+              <FaUtensils className="text-2xl text-primary-400 animate-pulse" />
             </div>
           </div>
           <LoadingSpinner text="Loading your feedback dashboard..." />
-          <p className="text-sm text-gray-600 mt-2">Getting today's menu and your progress...</p>
+          <p className="text-sm text-gray-400 mt-2">Getting today's menu and your progress...</p>
         </div>
       </div>
     );
@@ -255,11 +255,11 @@ const StudentDashboard = () => {
   const greeting = getTimeBasedGreeting();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-navy-950 via-navy-900 to-navy-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         
         {/* Enhanced Welcome Header */}
-        <div className={`bg-gradient-to-r ${greeting.color} text-white rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden animate-fadeIn`}>
+        <div className={`bg-gradient-to-r ${greeting.color} text-white rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden animate-fadeIn border border-primary-800/30`}>
           <div className="absolute top-0 right-0 w-32 h-32 bg-white bg-opacity-10 rounded-full -mr-16 -mt-16"></div>
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-white bg-opacity-5 rounded-full -ml-12 -mb-12"></div>
           
@@ -314,49 +314,49 @@ const StudentDashboard = () => {
         {/* Enhanced Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="animate-scaleIn stagger-item">
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
+            <div className="bg-navy-800 rounded-2xl shadow-xl border border-navy-700 p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl">
-                  <FaUsers className="text-2xl text-blue-600" />
+                <div className="p-3 bg-gradient-to-br from-blue-900/40 to-blue-800/40 rounded-xl border border-blue-700/30">
+                  <FaUsers className="text-2xl text-blue-400" />
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-blue-600">
+                  <div className="text-2xl font-bold text-blue-400">
                     {submissionStats?.totalSubmissionsToday || 0}
                   </div>
                   <div className="text-xs text-blue-500">+12% today</div>
                 </div>
               </div>
-              <h3 className="font-semibold text-gray-900 mb-1">Community Impact</h3>
-              <p className="text-sm text-gray-600">Students participated today</p>
+              <h3 className="font-semibold text-gray-200 mb-1">Community Impact</h3>
+              <p className="text-sm text-gray-400">Students participated today</p>
             </div>
           </div>
 
           <div className="animate-scaleIn stagger-item">
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
+            <div className="bg-navy-800 rounded-2xl shadow-xl border border-navy-700 p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-gradient-to-br from-green-100 to-green-200 rounded-xl">
-                  <FaTrophy className="text-2xl text-green-600" />
+                <div className="p-3 bg-gradient-to-br from-green-900/40 to-green-800/40 rounded-xl border border-green-700/30">
+                  <FaTrophy className="text-2xl text-green-400" />
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-green-600">
+                  <div className="text-2xl font-bold text-green-400">
                     {feedback?.stats?.submittedMeals || 0}/4
                   </div>
                   <div className="text-xs text-green-500">Keep going!</div>
                 </div>
               </div>
-              <h3 className="font-semibold text-gray-900 mb-1">Your Progress</h3>
-              <p className="text-sm text-gray-600">Meals reviewed today</p>
+              <h3 className="font-semibold text-gray-200 mb-1">Your Progress</h3>
+              <p className="text-sm text-gray-400">Meals reviewed today</p>
             </div>
           </div>
 
           <div className="animate-scaleIn stagger-item">
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
+            <div className="bg-navy-800 rounded-2xl shadow-xl border border-navy-700 p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-gradient-to-br from-orange-100 to-orange-200 rounded-xl">
-                  <FaFire className="text-2xl text-orange-600" />
+                <div className="p-3 bg-gradient-to-br from-orange-900/40 to-orange-800/40 rounded-xl border border-orange-700/30">
+                  <FaFire className="text-2xl text-orange-400" />
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-orange-600">
+                  <div className="text-2xl font-bold text-orange-400">
                     {feedback?.stats?.pendingMeals ?? 4}
                   </div>
                   <div className="text-xs text-orange-500">
@@ -364,35 +364,35 @@ const StudentDashboard = () => {
                   </div>
                 </div>
               </div>
-              <h3 className="font-semibold text-gray-900 mb-1">Pending Reviews</h3>
-              <p className="text-sm text-gray-600">Meals awaiting feedback</p>
+              <h3 className="font-semibold text-gray-200 mb-1">Pending Reviews</h3>
+              <p className="text-sm text-gray-400">Meals awaiting feedback</p>
             </div>
           </div>
 
           <div className="animate-scaleIn stagger-item">
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
+            <div className="bg-navy-800 rounded-2xl shadow-xl border border-navy-700 p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl">
-                  <FaGift className="text-2xl text-purple-600" />
+                <div className="p-3 bg-gradient-to-br from-purple-900/40 to-purple-800/40 rounded-xl border border-purple-700/30">
+                  <FaGift className="text-2xl text-purple-400" />
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-purple-600">127</div>
+                  <div className="text-2xl font-bold text-purple-400">127</div>
                   <div className="text-xs text-purple-500">+5 today</div>
                 </div>
               </div>
-              <h3 className="font-semibold text-gray-900 mb-1">Reward Points</h3>
-              <p className="text-sm text-gray-600">Earned through feedback</p>
+              <h3 className="font-semibold text-gray-200 mb-1">Reward Points</h3>
+              <p className="text-sm text-gray-400">Earned through feedback</p>
             </div>
           </div>
         </div>
 
         {/* Enhanced Today's Menu */}
         {todayMenu && (
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden animate-slideInLeft">
+          <div className="bg-navy-800 rounded-2xl shadow-xl border border-navy-700 overflow-hidden animate-slideInLeft">
             <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="p-3 bg-white bg-opacity-20 rounded-xl">
+                  <div className="p-3 bg-navy-900 bg-opacity-40 rounded-xl backdrop-blur-sm">
                     <FaCalendar className="text-2xl" />
                   </div>
                   <div>
@@ -418,15 +418,15 @@ const StudentDashboard = () => {
                   const Icon = mealType.icon;
                   
                   return (
-                    <div key={mealType.key} className={`animate-scaleIn stagger-item p-6 rounded-2xl ${mealType.cardBg} border-2 ${mealType.borderColor} shadow-lg`}>
+                    <div key={mealType.key} className={`animate-scaleIn stagger-item p-6 rounded-2xl bg-navy-900/50 border-2 ${mealType.borderColor} shadow-lg backdrop-blur-sm`}>
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-3">
                           <div className={`p-3 rounded-xl bg-gradient-to-r ${mealType.bgColor} text-white shadow-lg`}>
                             <Icon className="text-xl" />
                           </div>
                           <div>
-                            <h3 className="font-bold text-gray-900">{mealType.name}</h3>
-                            <p className="text-xs text-gray-600">{mealType.description}</p>
+                            <h3 className="font-bold text-gray-100">{mealType.name}</h3>
+                            <p className="text-xs text-gray-400">{mealType.description}</p>
                           </div>
                         </div>
                         <span className="text-2xl">{mealType.emoji}</span>
@@ -435,12 +435,12 @@ const StudentDashboard = () => {
                       {mealMenu?.items && mealMenu.items.length > 0 ? (
                         <div className="space-y-3">
                           {mealMenu.items.slice(0, 3).map((item, itemIndex) => (
-                            <div key={itemIndex} className="flex items-center space-x-3 p-2 bg-white bg-opacity-50 rounded-lg">
+                            <div key={itemIndex} className="flex items-center space-x-3 p-2 bg-navy-900 bg-opacity-60 rounded-lg backdrop-blur-sm">
                               <div className="w-2 h-2 bg-gradient-to-r from-green-400 to-blue-500 rounded-full"></div>
                               <div className="flex-1">
-                                <div className="font-medium text-gray-800 text-sm">{item.name}</div>
+                                <div className="font-medium text-gray-200 text-sm">{item.name}</div>
                                 {item.description && (
-                                  <div className="text-gray-600 text-xs">{item.description}</div>
+                                  <div className="text-gray-400 text-xs">{item.description}</div>
                                 )}
                               </div>
                             </div>
@@ -448,24 +448,24 @@ const StudentDashboard = () => {
                           
                           {mealMenu.items.length > 3 && (
                             <div className="text-center py-2">
-                              <span className="text-xs text-gray-500">+{mealMenu.items.length - 3} more items</span>
+                              <span className="text-xs text-gray-400">+{mealMenu.items.length - 3} more items</span>
                             </div>
                           )}
                           
                           {mealMenu.special && (
-                            <div className="mt-3 p-3 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-lg border border-yellow-200">
+                            <div className="mt-3 p-3 bg-gradient-to-r from-yellow-900/30 to-orange-900/30 rounded-lg border border-yellow-700/40">
                               <div className="flex items-center space-x-2">
-                                <FaStar className="text-yellow-500 text-sm" />
-                                <span className="text-xs font-bold text-yellow-800">Chef's Special</span>
+                                <FaStar className="text-yellow-400 text-sm" />
+                                <span className="text-xs font-bold text-yellow-400">Chef's Special</span>
                               </div>
-                              <div className="text-sm text-yellow-700 mt-1">{mealMenu.special}</div>
+                              <div className="text-sm text-yellow-300 mt-1">{mealMenu.special}</div>
                             </div>
                           )}
                         </div>
                       ) : (
                         <div className="text-center py-4">
-                          <div className="text-gray-400 text-2xl mb-2">🍽️</div>
-                          <div className="text-sm text-gray-500">Menu coming soon</div>
+                          <div className="text-gray-500 text-2xl mb-2">🍽️</div>
+                          <div className="text-sm text-gray-400">Menu coming soon</div>
                         </div>
                       )}
                     </div>
@@ -478,17 +478,17 @@ const StudentDashboard = () => {
 
         {/* Menu Status Message */}
         {!todayMenu && (
-          <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-2xl p-6 animate-fadeIn">
+          <div className="bg-gradient-to-r from-yellow-900/20 to-orange-900/20 border-2 border-yellow-700/40 rounded-2xl p-6 animate-fadeIn">
             <div className="flex items-center space-x-4">
-              <div className="p-3 bg-yellow-100 rounded-xl">
-                <FaUtensils className="text-2xl text-yellow-600" />
+              <div className="p-3 bg-yellow-900/20 rounded-xl border border-yellow-700/30">
+                <FaUtensils className="text-2xl text-yellow-400" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-yellow-800 mb-1">📋 Today's Menu</h3>
-                <p className="text-yellow-700 text-sm mb-2">
+                <h3 className="text-lg font-bold text-yellow-300 mb-1">📋 Today's Menu</h3>
+                <p className="text-yellow-400 text-sm mb-2">
                   We're preparing something special! Today's menu will be available soon.
                 </p>
-                <div className="flex items-center space-x-4 text-xs text-yellow-600">
+                <div className="flex items-center space-x-4 text-xs text-yellow-500">
                   <span>⏰ Current time: {new Date().toLocaleTimeString()}</span>
                   <span>📅 {new Date().toLocaleDateString()}</span>
                 </div>
@@ -501,36 +501,36 @@ const StudentDashboard = () => {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900">Share Your Experience</h2>
-              <p className="text-gray-600 mt-1">Your feedback helps us serve you better every day</p>
+              <h2 className="text-3xl font-bold text-gray-100">Share Your Experience</h2>
+              <p className="text-gray-400 mt-1">Your feedback helps us serve you better every day</p>
             </div>
             <div className="hidden md:flex items-center space-x-4">
               <div className="text-center">
-                <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mb-2">
+                <div className="w-12 h-12 bg-gradient-to-r from-indigo-600 to-purple-700 rounded-full flex items-center justify-center mb-2">
                   <FaComments className="text-white text-xl" />
                 </div>
-                <div className="text-xs text-gray-600 font-medium">Your voice matters</div>
+                <div className="text-xs text-gray-400 font-medium">Your voice matters</div>
               </div>
             </div>
           </div>
           
           {/* Progress Indicator */}
-          <div className="bg-white rounded-xl p-4 shadow-lg border border-gray-100">
+          <div className="bg-navy-800 rounded-xl p-4 shadow-lg border border-navy-700">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-gray-700">Today's Progress</h3>
-              <span className="text-xs text-gray-500">
+              <h3 className="text-sm font-semibold text-gray-300">Today's Progress</h3>
+              <span className="text-xs text-gray-400">
                 {feedback?.stats?.submittedMeals || 0} of 4 meals reviewed
               </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-navy-700 rounded-full h-2">
               <div 
                 className="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full transition-all duration-1000 ease-out"
                 style={{ width: `${((feedback?.stats?.submittedMeals || 0) / 4) * 100}%` }}
               ></div>
             </div>
-            <div className="flex justify-between mt-2 text-xs text-gray-500">
+            <div className="flex justify-between mt-2 text-xs text-gray-400">
               <span>Start</span>
-              <span className="font-medium text-green-600">
+              <span className="font-medium text-green-400">
                 {feedback?.stats?.submittedMeals === 4 ? '🎉 Complete!' : `${Math.round(((feedback?.stats?.submittedMeals || 0) / 4) * 100)}%`}
               </span>
               <span>Complete</span>
@@ -615,14 +615,14 @@ const StudentDashboard = () => {
         )} */}
 
         {/* Enhanced Instructions */}
-        <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-2xl p-8 border border-indigo-100 animate-fadeIn">
+        <div className="bg-gradient-to-br from-navy-900/80 via-navy-800/80 to-primary-900/50 rounded-2xl p-8 border border-navy-700 animate-fadeIn backdrop-blur-sm">
           <div className="flex items-center space-x-3 mb-6">
-            <div className="p-3 bg-indigo-100 rounded-xl">
-              <FaThumbsUp className="text-2xl text-indigo-600" />
+            <div className="p-3 bg-indigo-900/40 rounded-xl border border-indigo-700/30">
+              <FaThumbsUp className="text-2xl text-indigo-400" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900">How Your Feedback Works</h3>
-              <p className="text-gray-600 text-sm">Making every meal better together</p>
+              <h3 className="text-xl font-bold text-gray-100">How Your Feedback Works</h3>
+              <p className="text-gray-400 text-sm">Making every meal better together</p>
             </div>
           </div>
           
@@ -631,16 +631,16 @@ const StudentDashboard = () => {
               <div className="flex items-start space-x-3">
                 <div className="w-6 h-6 bg-indigo-500 text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
                 <div>
-                  <h4 className="font-semibold text-gray-900">Perfect Timing</h4>
-                  <p className="text-sm text-gray-600">Submit feedback only after meal times for authentic reviews</p>
+                  <h4 className="font-semibold text-gray-200">Perfect Timing</h4>
+                  <p className="text-sm text-gray-400">Submit feedback only after meal times for authentic reviews</p>
                 </div>
               </div>
               
               <div className="flex items-start space-x-3">
                 <div className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">2</div>
                 <div>
-                  <h4 className="font-semibold text-gray-900">Once Per Meal</h4>
-                  <p className="text-sm text-gray-600">Each meal gets one thoughtful review - make it count!</p>
+                  <h4 className="font-semibold text-gray-200">Once Per Meal</h4>
+                  <p className="text-sm text-gray-400">Each meal gets one thoughtful review - make it count!</p>
                 </div>
               </div>
             </div>
@@ -649,16 +649,16 @@ const StudentDashboard = () => {
               <div className="flex items-start space-x-3">
                 <div className="w-6 h-6 bg-yellow-500 text-white rounded-full flex items-center justify-center text-sm font-bold">3</div>
                 <div>
-                  <h4 className="font-semibold text-gray-900">Daily Fresh</h4>
-                  <p className="text-sm text-gray-600">Feedback resets daily for continuous improvement</p>
+                  <h4 className="font-semibold text-gray-200">Daily Fresh</h4>
+                  <p className="text-sm text-gray-400">Feedback resets daily for continuous improvement</p>
                 </div>
               </div>
               
               <div className="flex items-start space-x-3">
                 <div className="w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-bold">4</div>
                 <div>
-                  <h4 className="font-semibold text-gray-900">Real Impact</h4>
-                  <p className="text-sm text-gray-600">Your reviews directly improve meal quality and variety</p>
+                  <h4 className="font-semibold text-gray-200">Real Impact</h4>
+                  <p className="text-sm text-gray-400">Your reviews directly improve meal quality and variety</p>
                 </div>
               </div>
             </div>
@@ -666,15 +666,15 @@ const StudentDashboard = () => {
         </div>
 
         {/* Community Impact Footer */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 animate-fadeIn">
+        <div className="bg-navy-800 rounded-2xl shadow-lg border border-navy-700 p-6 animate-fadeIn">
           <div className="text-center">
             <div className="flex items-center justify-center space-x-4 mb-4">
               <div className="flex items-center space-x-2">
-                <FaUsers className="text-blue-600" />
-                <span className="text-sm font-medium text-gray-700">Together we've made</span>
+                <FaUsers className="text-blue-400" />
+                <span className="text-sm font-medium text-gray-300">Together we've made</span>
               </div>
-              <div className="text-2xl font-bold text-blue-600">2,847</div>
-              <div className="text-sm text-gray-600">improvements this month</div>
+              <div className="text-2xl font-bold text-blue-400">2,847</div>
+              <div className="text-sm text-gray-400">improvements this month</div>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
@@ -732,7 +732,7 @@ const MealFeedbackCard = ({ meal, feedback, status, onSubmit, submitting }) => {
   };
 
   return (
-    <div className={`bg-white rounded-2xl shadow-xl border-2 ${meal.borderColor} overflow-hidden`}>
+    <div className={`bg-navy-800 rounded-2xl shadow-xl border-2 ${meal.borderColor} overflow-hidden`}>
       <div className="p-6">
         <div className="flex items-center space-x-3 mb-6">
           <div className={`p-4 rounded-xl bg-gradient-to-r ${meal.bgColor} text-white shadow-lg`}>
@@ -740,10 +740,10 @@ const MealFeedbackCard = ({ meal, feedback, status, onSubmit, submitting }) => {
           </div>
           <div className="flex-1">
             <div className="flex items-center space-x-2 mb-1">
-              <h3 className="text-xl font-bold text-gray-900">{meal.name}</h3>
+              <h3 className="text-xl font-bold text-gray-100">{meal.name}</h3>
               {/* <span className="text-xl">{meal.emoji}</span> */}
             </div>
-            <p className="text-sm text-gray-600 mb-1">{meal.description}</p>
+            <p className="text-sm text-gray-400 mb-1">{meal.description}</p>
             <div className="flex items-center space-x-2 text-xs text-gray-500">
               <FaClock className="text-xs" />
               <span>{meal.time}</span>
@@ -752,9 +752,9 @@ const MealFeedbackCard = ({ meal, feedback, status, onSubmit, submitting }) => {
           <div className="flex flex-col items-center space-y-1">
             <status.icon className={`text-lg ${status.color}`} />
             <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-              status.status === 'submitted' ? 'bg-green-100 text-green-700' :
-              status.status === 'available' ? 'bg-blue-100 text-blue-700' :
-              'bg-gray-100 text-gray-500'
+              status.status === 'submitted' ? 'bg-green-900/30 text-green-400 border border-green-700/30' :
+              status.status === 'available' ? 'bg-blue-900/30 text-blue-400 border border-blue-700/30' :
+              'bg-gray-800 text-gray-500 border border-gray-700'
             }`}>
               {status.status === 'submitted' && 'Completed'}
               {status.status === 'available' && 'Ready'}
@@ -765,41 +765,41 @@ const MealFeedbackCard = ({ meal, feedback, status, onSubmit, submitting }) => {
 
         {hasSubmitted ? (
           <div className="space-y-4">
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+            <div className="bg-green-900/20 border border-green-700/40 rounded-xl p-4">
               <div className="flex items-center space-x-2 mb-3">
-                <FaCheckCircle className="text-green-600" />
-                <span className="font-semibold text-green-800">Feedback Submitted</span>
+                <FaCheckCircle className="text-green-400" />
+                <span className="font-semibold text-green-300">Feedback Submitted</span>
               </div>
               
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-700">Your Rating:</span>
+                  <span className="text-sm font-medium text-gray-300">Your Rating:</span>
                   <div className="flex items-center space-x-2">
                     <StarRating rating={feedback.rating} readonly size="sm" />
-                    <span className="text-sm font-bold text-green-600">{feedback.rating}/5</span>
+                    <span className="text-sm font-bold text-green-400">{feedback.rating}/5</span>
                   </div>
                 </div>
                 
                 {feedback.comment && (
                   <div>
-                    <span className="text-sm font-medium text-gray-700 block mb-2">Your Comment:</span>
-                    <div className="bg-white p-3 rounded-lg border border-green-200">
-                      <p className="text-sm text-gray-700 leading-relaxed">
+                    <span className="text-sm font-medium text-gray-300 block mb-2">Your Comment:</span>
+                    <div className="bg-navy-900 p-3 rounded-lg border border-green-700/30">
+                      <p className="text-sm text-gray-300 leading-relaxed">
                         "{feedback.comment}"
                       </p>
                     </div>
                   </div>
                 )}
                 
-                <div className="flex items-center space-x-2 text-xs text-green-600">
+                <div className="flex items-center space-x-2 text-xs text-green-400">
                   <FaClock className="text-xs" />
                   <span>Submitted at {new Date(feedback.submittedAt).toLocaleTimeString()}</span>
                 </div>
               </div>
             </div>
             
-            <div className="bg-gradient-to-r from-green-100 to-blue-100 p-4 rounded-xl">
-              <div className="flex items-center space-x-2 text-green-700">
+            <div className="bg-gradient-to-r from-green-900/30 to-blue-900/30 p-4 rounded-xl border border-green-700/30">
+              <div className="flex items-center space-x-2 text-green-300">
                 <FaHeart className="text-sm" />
                 <span className="text-sm font-medium">Thank you for making our food better!</span>
               </div>
@@ -807,15 +807,15 @@ const MealFeedbackCard = ({ meal, feedback, status, onSubmit, submitting }) => {
           </div>
         ) : canSubmit ? (
           <div className="space-y-5">
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+            <div className="bg-blue-900/20 border border-blue-700/40 rounded-xl p-4">
               <div className="flex items-center space-x-2 mb-3">
-                <FaStar className="text-blue-600" />
-                <span className="font-semibold text-blue-800">Share Your Experience</span>
+                <FaStar className="text-blue-400" />
+                <span className="font-semibold text-blue-300">Share Your Experience</span>
               </div>
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-3">
                     How would you rate this meal?
                   </label>
                   <div className="flex items-center space-x-3">
@@ -826,9 +826,9 @@ const MealFeedbackCard = ({ meal, feedback, status, onSubmit, submitting }) => {
                     />
                     {rating > 0 && (
                       <div className="flex items-center space-x-1">
-                        <span className="text-lg font-bold text-blue-600">{rating}</span>
-                        <span className="text-sm text-gray-500">/5</span>
-                        <span className="text-sm text-blue-600 font-medium">
+                        <span className="text-lg font-bold text-blue-400">{rating}</span>
+                        <span className="text-sm text-gray-400">/5</span>
+                        <span className="text-sm text-blue-400 font-medium">
                           {rating === 5 ? '🌟 Excellent!' : 
                            rating === 4 ? '😊 Great!' : 
                            rating === 3 ? '👍 Good' : 
@@ -840,7 +840,7 @@ const MealFeedbackCard = ({ meal, feedback, status, onSubmit, submitting }) => {
                 </div>
 
                 <div>
-                  <label htmlFor={`comment-${meal.key}`} className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor={`comment-${meal.key}`} className="block text-sm font-medium text-gray-300 mb-2">
                     Tell us more (optional):
                   </label>
                   <div className="relative">
@@ -848,12 +848,12 @@ const MealFeedbackCard = ({ meal, feedback, status, onSubmit, submitting }) => {
                       id={`comment-${meal.key}`}
                       value={comment}
                       onChange={(e) => setComment(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
+                      className="w-full px-4 py-3 bg-navy-900 border border-navy-700 text-gray-200 placeholder-gray-500 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
                       rows="3"
                       placeholder="What did you think about the taste, presentation, or portion size?"
                       maxLength="500"
                     />
-                    <div className="absolute bottom-2 right-2 text-xs text-gray-400">
+                    <div className="absolute bottom-2 right-2 text-xs text-gray-500">
                       {comment.length}/500
                     </div>
                   </div>
@@ -864,11 +864,11 @@ const MealFeedbackCard = ({ meal, feedback, status, onSubmit, submitting }) => {
             <button
               onClick={handleSubmit}
               disabled={submitting || isSubmitting || !rating}
-              className={`w-full py-4 px-6 rounded-xl font-semibold text-white shadow-lg ${
+              className={`w-full py-4 px-6 rounded-xl font-semibold text-white shadow-lg transition-all ${
                 !rating || submitting || isSubmitting
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : `bg-gradient-to-r ${meal.bgColor}`
-              }`}
+                  ? 'bg-gray-700 cursor-not-allowed opacity-50'
+                  : `bg-gradient-to-r ${meal.bgColor} hover:shadow-xl`
+              }`}>
             >
               {isSubmitting ? (
                 <div className="flex items-center justify-center space-x-2">
@@ -889,16 +889,16 @@ const MealFeedbackCard = ({ meal, feedback, status, onSubmit, submitting }) => {
         ) : (
           <div className="text-center py-8">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full opacity-20"></div>
-              <FaTimesCircle className="relative text-4xl text-gray-400 mx-auto mb-3" />
+              <div className="absolute inset-0 bg-gradient-to-r from-navy-700 to-navy-600 rounded-full opacity-20"></div>
+              <FaTimesCircle className="relative text-4xl text-gray-500 mx-auto mb-3" />
             </div>
-            <h4 className="font-semibold text-gray-600 mb-2">Feedback Not Available</h4>
+            <h4 className="font-semibold text-gray-400 mb-2">Feedback Not Available</h4>
             <p className="text-sm text-gray-500 mb-3">
               Come back after meal time to share your experience
             </p>
-            <div className="inline-flex items-center space-x-2 px-3 py-2 bg-gray-100 rounded-lg">
+            <div className="inline-flex items-center space-x-2 px-3 py-2 bg-navy-900 rounded-lg border border-navy-700">
               <FaClock className="text-xs text-gray-500" />
-              <span className="text-xs text-gray-600 font-medium">
+              <span className="text-xs text-gray-400 font-medium">
                 Available from {meal.availableFrom}
               </span>
             </div>

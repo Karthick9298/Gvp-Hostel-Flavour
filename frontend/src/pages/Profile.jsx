@@ -78,17 +78,17 @@ const Profile = () => {
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div className="text-center">
-        <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <FaUser className="text-3xl text-primary-600" />
+        <div className="w-20 h-20 bg-primary-900/40 border-2 border-primary-700/40 rounded-full flex items-center justify-center mx-auto mb-4">
+          <FaUser className="text-3xl text-primary-400" />
         </div>
-        <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
-        <p className="text-gray-600">Manage your account information</p>
+        <h1 className="text-2xl font-bold text-gray-100">Profile</h1>
+        <p className="text-gray-400">Manage your account information</p>
       </div>
 
       {/* Profile Form */}
       <div className="card">
         <div className="card-header flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-gray-900">Personal Information</h2>
+          <h2 className="text-lg font-semibold text-gray-200">Personal Information</h2>
           {!isEditing ? (
             <button
               onClick={() => setIsEditing(true)}
@@ -133,21 +133,21 @@ const Profile = () => {
                 placeholder="Enter your full name"
               />
             ) : (
-              <p className="text-gray-900 py-2">{profileData.name}</p>
+              <p className="text-gray-200 py-2">{profileData.name}</p>
             )}
           </div>
 
           {/* Email (readonly) */}
           <div>
             <label className="form-label">Email Address</label>
-            <p className="text-gray-900 py-2">{profileData.email}</p>
+            <p className="text-gray-200 py-2">{profileData.email}</p>
             <p className="text-xs text-gray-500">Email cannot be changed</p>
           </div>
 
           {/* Roll Number (readonly) */}
           <div>
             <label className="form-label">Roll Number</label>
-            <p className="text-gray-900 py-2">{profileData.rollNumber}</p>
+            <p className="text-gray-200 py-2">{profileData.rollNumber}</p>
             <p className="text-xs text-gray-500">Roll number cannot be changed</p>
           </div>
 
@@ -164,7 +164,7 @@ const Profile = () => {
                 placeholder="e.g., A-101, B-205"
               />
             ) : (
-              <p className="text-gray-900 py-2">{profileData.hostelRoom}</p>
+              <p className="text-gray-200 py-2">{profileData.hostelRoom}</p>
             )}
           </div>
 
@@ -174,8 +174,8 @@ const Profile = () => {
             <div className="flex items-center space-x-2 py-2">
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                 user?.isAdmin 
-                  ? 'bg-purple-100 text-purple-800' 
-                  : 'bg-blue-100 text-blue-800'
+                  ? 'bg-purple-900/30 text-purple-400 border border-purple-700/30' 
+                  : 'bg-blue-900/30 text-blue-400 border border-blue-700/30'
               }`}>
                 {user?.isAdmin ? 'Administrator' : 'Student'}
               </span>
@@ -187,19 +187,19 @@ const Profile = () => {
       {/* Account Stats */}
       <div className="card">
         <div className="card-header">
-          <h2 className="text-lg font-semibold text-gray-900">Account Information</h2>
+          <h2 className="text-lg font-semibold text-gray-200">Account Information</h2>
         </div>
         <div className="card-body">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="text-gray-600">Member since:</span>
-              <p className="font-medium text-gray-900">
+              <span className="text-gray-400">Member since:</span>
+              <p className="font-medium text-gray-200">
                 {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
               </p>
             </div>
             <div>
-              <span className="text-gray-600">Last login:</span>
-              <p className="font-medium text-gray-900">
+              <span className="text-gray-400">Last login:</span>
+              <p className="font-medium text-gray-200">
                 {user?.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'N/A'}
               </p>
             </div>

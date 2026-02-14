@@ -112,7 +112,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-navy-950">
           <AppRoutes />
           <Toaster
             position="top-right"

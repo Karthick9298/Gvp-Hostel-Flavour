@@ -115,40 +115,72 @@ const DailyAnalysisDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white relative overflow-hidden">
-          <div className="absolute inset-0 bg-black bg-opacity-10"></div>
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex items-center justify-between animate-fadeIn">
-              <div className="flex items-center space-x-6">
-                <div className="p-4 bg-white bg-opacity-20 rounded-2xl shadow-lg backdrop-blur-sm">
-                  <FaChartBar className="text-4xl animate-pulse" />
+      <div className="min-h-screen bg-gradient-to-br from-navy-950 via-navy-900 to-navy-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+          {/* Enhanced Header */}
+          <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden animate-fadeIn border border-primary-800/30">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white bg-opacity-10 rounded-full -mr-16 -mt-16"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white bg-opacity-5 rounded-full -ml-12 -mb-12"></div>
+            
+            <div className="relative">
+              <div className="flex items-center space-x-4 sm:space-x-6">
+                <div className="p-3 sm:p-4 bg-white bg-opacity-20 rounded-2xl shadow-lg backdrop-blur-sm flex-shrink-0">
+                  <FaChartBar className="text-2xl sm:text-4xl animate-pulse" />
                 </div>
                 <div>
-                  <h1 className="text-4xl font-bold">Daily Analysis Dashboard</h1>
-                  <p className="text-indigo-100 mt-2">Hostel Food Feedback & Insights</p>
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">Daily Analysis Dashboard</h1>
+                  <p className="text-white text-opacity-90 mt-2">Hostel Food Feedback & Insights</p>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Loading Content */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-16">
-            <div className="flex flex-col items-center justify-center space-y-6">
+          {/* Loading Content */}
+          <div className="bg-navy-800 rounded-2xl shadow-2xl border border-navy-700 p-8 sm:p-12 lg:p-16 relative overflow-hidden">
+            {/* Animated Background Gradient */}
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/10 via-purple-900/10 to-pink-900/10 animate-pulse"></div>
+            
+            <div className="relative flex flex-col items-center justify-center space-y-6">
+              {/* Enhanced Spinner */}
               <div className="relative">
-                <div className="w-24 h-24 border-8 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
-                <FaChartBar className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl text-indigo-600" />
+                {/* Outer ring */}
+                <div className="absolute w-32 h-32 border-4 border-indigo-900/20 rounded-full"></div>
+                {/* Middle ring */}
+                <div className="absolute w-28 h-28 border-4 border-purple-900/30 rounded-full animate-spin" style={{animationDuration: '3s', top: '8px', left: '8px'}}></div>
+                {/* Inner spinning ring */}
+                <div className="w-24 h-24 border-8 border-navy-700 border-t-indigo-400 border-r-purple-400 rounded-full animate-spin shadow-lg shadow-indigo-900/50"></div>
+                {/* Center icon */}
+                <FaChartBar className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl text-indigo-400 animate-pulse" />
               </div>
-              <div className="text-center">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Analyzing Data...</h3>
-                <p className="text-gray-600">Generating insights and visualizations for {selectedDate}</p>
-                <div className="mt-4 flex items-center justify-center space-x-2">
-                  <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
-                  <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
-                  <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+              
+              {/* Loading Text with Gradient */}
+              <div className="text-center space-y-3">
+                <h3 className="text-3xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
+                  Analyzing Data...
+                </h3>
+                <p className="text-gray-300 text-lg">Generating insights and visualizations for {selectedDate}</p>
+                
+                {/* Progress Indicators */}
+                <div className="mt-6 space-y-2">
+                  <div className="flex items-center justify-center space-x-2 text-sm text-gray-400">
+                    <div className="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></div>
+                    <span>Processing feedback data</span>
+                  </div>
+                  <div className="flex items-center justify-center space-x-2 text-sm text-gray-400">
+                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                    <span>Creating visualizations</span>
+                  </div>
+                  <div className="flex items-center justify-center space-x-2 text-sm text-gray-400">
+                    <div className="w-2 h-2 bg-pink-400 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                    <span>Analyzing sentiment</span>
+                  </div>
+                </div>
+                
+                {/* Animated Dots */}
+                <div className="mt-6 flex items-center justify-center space-x-2">
+                  <div className="w-3 h-3 bg-indigo-400 rounded-full animate-bounce shadow-lg shadow-indigo-500/50" style={{animationDelay: '0ms'}}></div>
+                  <div className="w-3 h-3 bg-purple-400 rounded-full animate-bounce shadow-lg shadow-purple-500/50" style={{animationDelay: '150ms'}}></div>
+                  <div className="w-3 h-3 bg-pink-400 rounded-full animate-bounce shadow-lg shadow-pink-500/50" style={{animationDelay: '300ms'}}></div>
                 </div>
               </div>
             </div>
@@ -159,44 +191,45 @@ const DailyAnalysisDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-black bg-opacity-10"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-between animate-fadeIn">
-            <div className="flex items-center space-x-6">
-              <div className="p-4 bg-white bg-opacity-20 rounded-2xl shadow-lg backdrop-blur-sm">
-                <FaChartBar className="text-4xl animate-pulse" />
+    <div className="min-h-screen bg-gradient-to-br from-navy-950 via-navy-900 to-navy-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        {/* Enhanced Header */}
+        <div className="bg-gradient-to-r from-slate-900 via-indigo-900 to-slate-800
+ text-white rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden animate-fadeIn border border-primary-800/30">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white bg-opacity-10 rounded-full -mr-16 -mt-16"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white bg-opacity-5 rounded-full -ml-12 -mb-12"></div>
+          
+          <div className="relative">
+            <div className="flex items-center space-x-4 sm:space-x-6">
+              <div className="p-3 sm:p-4 bg-white bg-opacity-20 rounded-2xl shadow-lg backdrop-blur-sm flex-shrink-0">
+                <FaChartBar className="text-2xl sm:text-4xl animate-pulse" />
               </div>
               <div>
-                <h1 className="text-4xl font-bold">Daily Analysis Dashboard</h1>
-                <p className="text-indigo-100 mt-2">Hostel Food Feedback & Insights</p>
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">Daily Analysis Dashboard</h1>
+                <p className="text-white text-opacity-90 mt-2">Hostel Food Feedback & Insights</p>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-          <div className="p-8">
+        <div className="bg-navy-800 rounded-2xl shadow-xl border border-navy-700 overflow-hidden">
+          <div className="p-6 sm:p-8">
             <div className="space-y-8">
               {/* Date Selector */}
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-3xl font-bold text-gray-900">Daily Analysis</h2>
-                  <p className="text-gray-600 mt-1">Select a date and click 'Analyze' to view insights</p>
+                  <h2 className="text-3xl font-bold text-gray-100">Daily Analysis</h2>
+                  <p className="text-gray-400 mt-1">Select a date and click 'Analyze' to view insights</p>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <label className="text-sm font-medium text-gray-700">Analysis Date:</label>
+                  <label className="text-sm font-medium text-gray-300">Analysis Date:</label>
                   <div className="relative">
                     <input
                       type="date"
                       value={selectedDate}
                       onChange={(e) => setSelectedDate(e.target.value)}
                       max={new Date(Date.now() - 86400000).toISOString().split('T')[0]}
-                      className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+                      className="px-4 py-3 bg-navy-900 border border-navy-700 text-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
                       disabled={loading}
                     />
                     <FaCalendarAlt className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
@@ -226,41 +259,41 @@ const DailyAnalysisDashboard = () => {
 
               {/* Initial State - No Data Loaded */}
               {!loading && !dailyData && (
-                <div className="bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-dashed border-indigo-300 rounded-2xl p-12 text-center">
+                <div className="bg-gradient-to-br from-navy-800 to-navy-900 border-2 border-dashed border-indigo-700/40 rounded-2xl p-12 text-center">
                   <div className="flex items-center justify-center mb-6">
-                    <div className="p-6 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full">
-                      <FaChartBar className="text-indigo-600 text-4xl" />
+                    <div className="p-6 bg-gradient-to-br from-indigo-900/40 to-purple-900/40 border-2 border-indigo-700/40 rounded-full">
+                      <FaChartBar className="text-indigo-400 text-4xl" />
                     </div>
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-800 mb-3">Ready to Analyze</h3>
-                  <p className="text-gray-600 text-lg mb-2">Select a date from the calendar above</p>
-                  <p className="text-gray-500">Click the <span className="font-semibold text-indigo-600">'Analyze'</span> button to view detailed insights</p>
+                  <h3 className="text-2xl font-bold text-gray-100 mb-3">Ready to Analyze</h3>
+                  <p className="text-gray-300 text-lg mb-2">Select a date from the calendar above</p>
+                  <p className="text-gray-400">Click the <span className="font-semibold text-indigo-400">'Analyze'</span> button to view detailed insights</p>
                 </div>
               )}
 
               {/* No Feedback State */}
               {dailyData && dailyData.type === 'no_feedback' && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-8 text-center">
+                <div className="bg-yellow-900/20 border border-yellow-700/40 rounded-2xl p-8 text-center">
                   <div className="flex items-center justify-center mb-4">
-                    <div className="p-4 bg-yellow-100 rounded-full">
-                      <FaExclamationTriangle className="text-yellow-600 text-2xl" />
+                    <div className="p-4 bg-yellow-900/30 border border-yellow-700/40 rounded-full">
+                      <FaExclamationTriangle className="text-yellow-400 text-2xl" />
                     </div>
                   </div>
-                  <h3 className="text-xl font-bold text-yellow-800 mb-2">No Feedback Found</h3>
-                  <p className="text-yellow-700">{dailyData.message}</p>
+                  <h3 className="text-xl font-bold text-yellow-300 mb-2">No Feedback Found</h3>
+                  <p className="text-yellow-400">{dailyData.message}</p>
                 </div>
               )}
 
               {/* Future Date State */}
               {dailyData && dailyData.type === 'future_date' && (
-                <div className="bg-blue-50 border border-blue-200 rounded-2xl p-8 text-center">
+                <div className="bg-blue-900/20 border border-blue-700/40 rounded-2xl p-8 text-center">
                   <div className="flex items-center justify-center mb-4">
-                    <div className="p-4 bg-blue-100 rounded-full">
-                      <FaClock className="text-blue-600 text-2xl" />
+                    <div className="p-4 bg-blue-900/30 border border-blue-700/40 rounded-full">
+                      <FaClock className="text-blue-400 text-2xl" />
                     </div>
                   </div>
-                  <h3 className="text-xl font-bold text-blue-800 mb-2">Feedback Not Available</h3>
-                  <p className="text-blue-700">{dailyData.message}</p>
+                  <h3 className="text-xl font-bold text-blue-300 mb-2">Feedback Not Available</h3>
+                  <p className="text-blue-400">{dailyData.message}</p>
                 </div>
               )}
 
@@ -269,12 +302,12 @@ const DailyAnalysisDashboard = () => {
                 <>
                   {/* Daily Summary Section */}
                   {dailyData.dailySummary && (
-                    <div className="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border-2 border-indigo-200 shadow-lg">
-                      <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
-                        <FaLightbulb className="text-indigo-600" />
+                    <div className="mb-8 bg-gradient-to-r from-navy-800 to-navy-900 rounded-2xl p-6 border-2 border-indigo-700/40 shadow-lg">
+                      <h3 className="text-xl font-bold text-gray-100 mb-4 flex items-center space-x-2">
+                        <FaLightbulb className="text-indigo-400" />
                         <span>Daily Summary</span>
                       </h3>
-                      <p className="text-gray-800 leading-relaxed text-base">
+                      <p className="text-gray-200 leading-relaxed text-base">
                         {dailyData.dailySummary}
                       </p>
                     </div>
@@ -283,14 +316,14 @@ const DailyAnalysisDashboard = () => {
                   {/* Overview Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <div className="bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 text-white rounded-2xl p-8 shadow-xl relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-24 h-24 bg-white bg-opacity-10 rounded-full -mr-12 -mt-12"></div>
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-navy-900 bg-opacity-30 rounded-full -mr-12 -mt-12"></div>
                       <div className="relative">
                         <div className="flex items-center justify-between mb-4">
                           <div>
                             <p className="text-blue-100 text-sm font-medium uppercase tracking-wide">Total Students</p>
                             <p className="text-4xl font-bold">{dailyData.overview?.totalStudents || 0}</p>
                           </div>
-                          <div className="p-3 bg-white bg-opacity-20 rounded-xl">
+                          <div className="p-3 bg-navy-900 bg-opacity-40 rounded-xl backdrop-blur-sm">
                             <FaUsers className="text-3xl" />
                           </div>
                         </div>
@@ -302,20 +335,20 @@ const DailyAnalysisDashboard = () => {
                     </div>
 
                     <div className="bg-gradient-to-br from-green-500 via-green-600 to-green-700 text-white rounded-2xl p-8 shadow-xl relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-24 h-24 bg-white bg-opacity-10 rounded-full -mr-12 -mt-12"></div>
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-navy-900 bg-opacity-30 rounded-full -mr-12 -mt-12"></div>
                       <div className="relative">
                         <div className="flex items-center justify-between mb-4">
                           <div>
                             <p className="text-green-100 text-sm font-medium uppercase tracking-wide">Participation Rate</p>
                             <p className="text-4xl font-bold">{dailyData.overview?.participationRate || 0}%</p>
                           </div>
-                          <div className="p-3 bg-white bg-opacity-20 rounded-xl">
+                          <div className="p-3 bg-navy-900 bg-opacity-40 rounded-xl backdrop-blur-sm">
                             <FaChartLine className="text-3xl" />
                           </div>
                         </div>
-                        <div className="w-full bg-green-400 bg-opacity-30 rounded-full h-2">
+                        <div className="w-full bg-green-900 bg-opacity-40 rounded-full h-2">
                           <div 
-                            className="bg-white h-2 rounded-full transition-all duration-1000"
+                            className="bg-green-200 h-2 rounded-full transition-all duration-1000"
                             style={{ width: `${dailyData.overview?.participationRate || 0}%` }}
                           ></div>
                         </div>
@@ -323,14 +356,14 @@ const DailyAnalysisDashboard = () => {
                     </div>
 
                     <div className="bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 text-white rounded-2xl p-8 shadow-xl relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-24 h-24 bg-white bg-opacity-10 rounded-full -mr-12 -mt-12"></div>
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-navy-900 bg-opacity-30 rounded-full -mr-12 -mt-12"></div>
                       <div className="relative">
                         <div className="flex items-center justify-between mb-4">
                           <div>
                             <p className="text-amber-100 text-sm font-medium uppercase tracking-wide">Quality Consistency</p>
                             <p className="text-4xl font-bold">{dailyData.overview?.qualityConsistencyScore || 0}/100</p>
                           </div>
-                          <div className="p-3 bg-white bg-opacity-20 rounded-xl">
+                          <div className="p-3 bg-navy-900 bg-opacity-40 rounded-xl backdrop-blur-sm">
                             <FaChartLine className="text-3xl" />
                           </div>
                         </div>
@@ -345,14 +378,14 @@ const DailyAnalysisDashboard = () => {
                     </div>
 
                     <div className="bg-gradient-to-br from-purple-500 via-purple-600 to-purple-700 text-white rounded-2xl p-8 shadow-xl relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-24 h-24 bg-white bg-opacity-10 rounded-full -mr-12 -mt-12"></div>
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-navy-900 bg-opacity-30 rounded-full -mr-12 -mt-12"></div>
                       <div className="relative">
                         <div className="flex items-center justify-between mb-4">
                           <div>
                             <p className="text-purple-100 text-sm font-medium uppercase tracking-wide">Overall Rating</p>
                             <p className="text-4xl font-bold">{dailyData.overview?.overallRating || 0}/5.0</p>
                           </div>
-                          <div className="p-3 bg-white bg-opacity-20 rounded-xl">
+                          <div className="p-3 bg-navy-900 bg-opacity-40 rounded-xl backdrop-blur-sm">
                             <FaStar className="text-3xl" />
                           </div>
                         </div>
@@ -376,15 +409,15 @@ const DailyAnalysisDashboard = () => {
                   {dailyData.charts && (
                     <div className="mt-8">
                       <div className="mb-6">
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">AI-Generated Visual Analysis</h3>
-                        <p className="text-gray-600">Professional data visualizations using matplotlib & seaborn</p>
+                        <h3 className="text-2xl font-bold text-gray-100 mb-2">AI-Generated Visual Analysis</h3>
+                        <p className="text-gray-400">Professional data visualizations using matplotlib & seaborn</p>
                       </div>
                       
                       <div className="space-y-8">
                         {dailyData.charts.avgRatings?.base64 && (
-                          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
-                            <h4 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
-                              <FaChartBar className="text-indigo-600" />
+                          <div className="bg-navy-800 rounded-2xl p-6 shadow-xl border border-navy-700">
+                            <h4 className="text-xl font-bold text-gray-100 mb-4 flex items-center space-x-2">
+                              <FaChartBar className="text-indigo-400" />
                               <span>Average Ratings per Meal</span>
                             </h4>
                             <div className="flex justify-center">
@@ -398,9 +431,9 @@ const DailyAnalysisDashboard = () => {
                         )}
 
                         {dailyData.charts.distribution?.base64 && (
-                          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
-                            <h4 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
-                              <FaChartBar className="text-purple-600" />
+                          <div className="bg-navy-800 rounded-2xl p-6 shadow-xl border border-navy-700">
+                            <h4 className="text-xl font-bold text-gray-100 mb-4 flex items-center space-x-2">
+                              <FaChartBar className="text-purple-400" />
                               <span>Rating Distribution by Star</span>
                             </h4>
                             <div className="flex justify-center">
@@ -414,9 +447,9 @@ const DailyAnalysisDashboard = () => {
                         )}
 
                         {dailyData.charts.sentiment?.base64 && (
-                          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
-                            <h4 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
-                              <FaComments className="text-green-600" />
+                          <div className="bg-navy-800 rounded-2xl p-6 shadow-xl border border-navy-700">
+                            <h4 className="text-xl font-bold text-gray-100 mb-4 flex items-center space-x-2">
+                              <FaComments className="text-green-400" />
                               <span>Sentiment Analysis (NLP-Based)</span>
                             </h4>
                             <div className="flex justify-center">
@@ -432,14 +465,14 @@ const DailyAnalysisDashboard = () => {
                               <div className="mt-6 grid md:grid-cols-2 gap-6">
                                 {/* Positive Comments */}
                                 {dailyData.charts.sentiment.topComments.positive?.length > 0 && (
-                                  <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-                                    <h5 className="font-bold text-green-800 mb-3 flex items-center">
+                                  <div className="bg-green-900/20 rounded-lg p-4 border border-green-700/40">
+                                    <h5 className="font-bold text-green-300 mb-3 flex items-center">
                                       <span className="mr-2">✅</span> Top Positive Comments
                                     </h5>
                                     <div className="space-y-3">
                                       {dailyData.charts.sentiment.topComments.positive.map((comment, idx) => (
-                                        <div key={idx} className="bg-white rounded p-3 shadow-sm">
-                                          <p className="text-sm text-gray-700 mb-1">"{comment.text}"</p>
+                                        <div key={idx} className="bg-navy-900/60 rounded p-3 shadow-sm border border-green-800/30">
+                                          <p className="text-sm text-gray-300 mb-1">"{comment.text}"</p>
                                           <p className="text-xs text-gray-500">
                                             {comment.meal} • {comment.rating}★
                                           </p>
@@ -451,14 +484,14 @@ const DailyAnalysisDashboard = () => {
                                 
                                 {/* Negative Comments */}
                                 {dailyData.charts.sentiment.topComments.negative?.length > 0 && (
-                                  <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-                                    <h5 className="font-bold text-red-800 mb-3 flex items-center">
+                                  <div className="bg-red-900/20 rounded-lg p-4 border border-red-700/40">
+                                    <h5 className="font-bold text-red-300 mb-3 flex items-center">
                                       <span className="mr-2">❌</span> Top Concerns
                                     </h5>
                                     <div className="space-y-3">
                                       {dailyData.charts.sentiment.topComments.negative.map((comment, idx) => (
-                                        <div key={idx} className="bg-white rounded p-3 shadow-sm">
-                                          <p className="text-sm text-gray-700 mb-1">"{comment.text}"</p>
+                                        <div key={idx} className="bg-navy-900/60 rounded p-3 shadow-sm border border-red-800/30">
+                                          <p className="text-sm text-gray-300 mb-1">"{comment.text}"</p>
                                           <p className="text-xs text-gray-500">
                                             {comment.meal} • {comment.rating}★
                                           </p>
@@ -473,9 +506,9 @@ const DailyAnalysisDashboard = () => {
                         )}
 
                         {dailyData.charts.participation?.base64 && (
-                          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
-                            <h4 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
-                              <FaUsers className="text-blue-600" />
+                          <div className="bg-navy-800 rounded-2xl p-6 shadow-xl border border-navy-700">
+                            <h4 className="text-xl font-bold text-gray-100 mb-4 flex items-center space-x-2">
+                              <FaUsers className="text-blue-400" />
                               <span>Student Participation Rate</span>
                             </h4>
                             <div className="flex justify-center">
@@ -489,9 +522,9 @@ const DailyAnalysisDashboard = () => {
                         )}
 
                         {dailyData.charts.wordcloud?.base64 && (
-                          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
-                            <h4 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
-                              <FaComments className="text-pink-600" />
+                          <div className="bg-navy-800 rounded-2xl p-6 shadow-xl border border-navy-700">
+                            <h4 className="text-xl font-bold text-gray-100 mb-4 flex items-center space-x-2">
+                              <FaComments className="text-pink-400" />
                               <span>Comment Word Cloud</span>
                             </h4>
                             <div className="flex justify-center">

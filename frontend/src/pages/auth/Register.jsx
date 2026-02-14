@@ -99,18 +99,18 @@ const Register = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-navy-950 via-navy-900 to-primary-950 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
           <div className="flex justify-center items-center space-x-2 mb-4">
-            <FaUtensils className="text-4xl text-primary-600" />
-            <h1 className="text-3xl font-bold text-gray-900">GVP</h1>
+            <FaUtensils className="text-4xl text-accent-400" />
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent">GVP</h1>
           </div>
-          <h2 className="text-2xl font-semibold text-gray-700">
+          <h2 className="text-2xl font-semibold text-gray-200">
             Create Your Account
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-gray-400">
             Join the Hostel Flavour platform
           </p>
         </div>

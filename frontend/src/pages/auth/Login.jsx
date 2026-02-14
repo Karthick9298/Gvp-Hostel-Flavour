@@ -92,18 +92,18 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-navy-950 via-navy-900 to-primary-950 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
           <div className="flex justify-center items-center space-x-2 mb-4">
-            <FaUtensils className="text-4xl text-primary-600" />
-            <h1 className="text-3xl font-bold text-gray-900">GVP</h1>
+            <FaUtensils className="text-4xl text-accent-400" />
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent">GVP</h1>
           </div>
-          <h2 className="text-2xl font-semibold text-gray-700">
+          <h2 className="text-2xl font-semibold text-gray-200">
             Hostel Flavour
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-gray-400">
             Sign in to submit your food feedback
           </p>
         </div>
@@ -149,7 +149,7 @@ const Login = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-300"
                   >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
@@ -180,10 +180,10 @@ const Login = () => {
             <div className="mt-6">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300" />
+                  <div className="w-full border-t border-navy-700" />
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                  <span className="px-2 bg-navy-800 text-gray-400">Or continue with</span>
                 </div>
               </div>
             </div>
@@ -192,7 +192,7 @@ const Login = () => {
             <button
               onClick={handleGoogleLogin}
               disabled={loading}
-              className="mt-4 w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200"
+              className="mt-4 w-full flex items-center justify-center px-4 py-2 border border-navy-700 rounded-lg shadow-sm text-sm font-medium text-gray-200 bg-navy-900 hover:bg-navy-800 transition-all duration-200"
             >
               <FaGoogle className="mr-2 text-red-500" />
               Sign in with Google (GVPCE)
@@ -200,11 +200,11 @@ const Login = () => {
 
             {/* Register Link */}
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-400">
                 Don't have an account?{' '}
                 <Link
                   to="/register"
-                  className="font-medium text-primary-600 hover:text-primary-500 transition-colors duration-200"
+                  className="font-medium text-primary-400 hover:text-primary-300 transition-colors duration-200"
                 >
                   Register here
                 </Link>
