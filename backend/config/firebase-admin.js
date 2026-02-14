@@ -1,51 +1,35 @@
 import admin from 'firebase-admin';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Load environment variables first
+dotenv.config();
 
 // Initialize Firebase Admin SDK
 const initializeFirebaseAdmin = () => {
   if (!admin.apps.length) {
     try {
-      // Check if service account key file exists
-      const serviceAccountPath = path.join(__dirname, 'serviceAccountKey.json');
+      // Use certificate-based initialization with environment variables
+      const privateKey = process.env.FIREBASE_PRIVATE_KEY 
+        ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') 
+        : undefined;
       
-      if (fs.existsSync(serviceAccountPath)) {
-        // Production mode: Use service account key file
-        const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
-        
-        admin.initializeApp({
-          credential: admin.credential.cert(serviceAccount),
-          projectId: serviceAccount.project_id
-        });
-        
-        console.log('✅ Firebase Admin initialized with service account');
-      } else if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-        // Use service account from environment variable (for deployment)
-        const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-        
-        admin.initializeApp({
-          credential: admin.credential.cert(serviceAccount),
-          projectId: serviceAccount.project_id
-        });
-        
-        console.log('✅ Firebase Admin initialized from environment variable');
-      } else {
-        // Development fallback: Use emulator or simple config
-        // NOTE: This won't work for token verification in production!
-        console.warn('⚠️  WARNING: No service account found. Using fallback mode.');
-        console.warn('⚠️  Token verification will NOT work without proper Firebase Admin setup.');
-        console.warn('⚠️  Please add serviceAccountKey.json to backend/config/ directory.');
-        console.warn('⚠️  Download it from Firebase Console > Project Settings > Service Accounts');
-        
-        admin.initializeApp({
-          projectId: process.env.FIREBASE_PROJECT_ID || 'hostel-food-analysis',
-        });
+      const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+      const projectId = process.env.FIREBASE_PROJECT_ID;
+
+      if (!privateKey || !clientEmail || !projectId) {
+        throw new Error('Missing Firebase credentials. Please set FIREBASE_PRIVATE_KEY, FIREBASE_CLIENT_EMAIL, and FIREBASE_PROJECT_ID in .env file');
       }
+
+      admin.initializeApp({
+        credential: admin.credential.cert({
+          projectId: projectId,
+          clientEmail: clientEmail,
+          privateKey: privateKey,
+        }),
+        projectId: projectId,
+      });
       
+      console.log('✅ Firebase Admin initialized successfully with certificate');
     } catch (error) {
       console.error('❌ Firebase Admin initialization failed:', error.message);
       throw error;

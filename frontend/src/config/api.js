@@ -9,12 +9,12 @@ const api = axios.create({
   },
 });
 
-// Request interceptor to add Firebase auth token
+// Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    const firebaseToken = localStorage.getItem('firebaseToken');
-    if (firebaseToken) {
-      config.headers.Authorization = `Bearer ${firebaseToken}`;
+    const authToken = localStorage.getItem('authToken');
+    if (authToken) {
+      config.headers.Authorization = `Bearer ${authToken}`;
     }
     return config;
   },
@@ -33,21 +33,21 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Unauthorized - remove token and redirect to login
       localStorage.removeItem('firebaseToken');
-      window.location.href = '/login';
+      if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+        window.location.href = '/login';
+      }
     }
     
-    // Return error response or message
-    return Promise.reject(
-      error.response?.data?.message || 
-      error.message || 
-      'An unexpected error occurred'
-    );
+    // Return full error object for better error handling
+    return Promise.reject(error);
   }
 );
 
 // API methods
 export const authAPI = {
   register: (data) => api.post('/auth/register', data),
+  login: (data) => api.post('/auth/login', data),
+  googleLogin: (idToken) => api.post('/auth/google-login', { idToken }),
   syncUser: () => api.post('/auth/sync-user'),
   getMe: () => api.get('/auth/me'),
   logout: () => api.post('/auth/logout'),

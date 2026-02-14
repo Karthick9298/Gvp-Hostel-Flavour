@@ -105,23 +105,16 @@ MONGODB_URI=mongodb://localhost:27017/hostel-food-analysis
 
 # Firebase Configuration
 FIREBASE_PROJECT_ID=your-firebase-project-id
+FIREBASE_SERVICE_ACCOUNT_PATH=./config/serviceAccountKey.json
 
 # Optional: AI Suggestions (Hugging Face)
 # HUGGINGFACE_API_KEY=your-hf-api-key
 ```
 
-**🔥 Firebase Setup (REQUIRED FOR AUTHENTICATION):**
-
-**See detailed setup guide: [FIREBASE_SETUP.md](./FIREBASE_SETUP.md)**
-
-Quick steps:
-1. Download service account key from [Firebase Console](https://console.firebase.google.com/)
-2. Save as `backend/config/serviceAccountKey.json` (already in .gitignore)
-3. Restart backend server
-
-Without this, authentication will fail! ⚠️
-
----
+**Firebase Setup:**
+1. Go to Firebase Console → Project Settings → Service Accounts
+2. Click "Generate New Private Key"
+3. Save as `backend/config/serviceAccountKey.json`
 ### 2️⃣ Analytics Service (Python)
 
 The backend uses the root Python virtual environment at `.venv/bin/python`.
