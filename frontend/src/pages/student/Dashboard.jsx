@@ -259,7 +259,7 @@ const StudentDashboard = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         
         {/* Enhanced Welcome Header */}
-        <div className={`bg-gradient-to-r ${greeting.color} text-white rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden animate-fadeIn border border-primary-800/30`}>
+        <div className={`bg-gradient-to-r from-slate-900 via-indigo-900 to-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden animate-fadeIn border border-primary-800/30`}>
           <div className="absolute top-0 right-0 w-32 h-32 bg-white bg-opacity-10 rounded-full -mr-16 -mt-16"></div>
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-white bg-opacity-5 rounded-full -ml-12 -mb-12"></div>
           
@@ -267,11 +267,11 @@ const StudentDashboard = () => {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div className="flex items-center space-x-4 sm:space-x-6">
                 <div className="p-3 sm:p-4 bg-white bg-opacity-20 rounded-2xl shadow-lg backdrop-blur-sm flex-shrink-0">
-                  <FaUtensils className="text-2xl sm:text-4xl animate-pulse-custom" />
+                  <FaUtensils className="text-2xl sm:text-4xl animate-pulse-custom text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center space-x-2 sm:space-x-3 mb-2">
-                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold truncate">{greeting.text}, {user?.name}!</h1>
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold truncate text-white">{greeting.text}, {user?.name}!</h1>
                     <span className="text-xl sm:text-2xl flex-shrink-0">{greeting.icon}</span>
                   </div>
                   <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-white text-opacity-90">
