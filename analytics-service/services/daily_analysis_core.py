@@ -347,20 +347,19 @@ def analyze_daily_feedback(date_str: str, include_charts: bool = True) -> dict:
             "allComments": all_comments
         }
         
-        # Generate charts if requested
+        # Generate charts if requested (base64 only, no file storage)
         charts = None
         if include_charts:
             try:
-                output_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'output')
-                chart_gen = ChartGenerator(output_dir=output_dir)
-                charts = chart_gen.generate_all_charts(analysis_data, date_str)
+                chart_gen = ChartGenerator()
+                charts = chart_gen.generate_all_charts(analysis_data)
             except Exception as chart_error:
                 print(f"Chart generation failed: {str(chart_error)}", file=sys.stderr)
                 charts = {
-                    'avgRatings': {'path': None, 'base64': None},
-                    'distribution': {'path': None, 'base64': None},
-                    'sentiment': {'path': None, 'base64': None},
-                    'participation': {'path': None, 'base64': None}
+                    'avgRatings': {'base64': None},
+                    'distribution': {'base64': None},
+                    'sentiment': {'base64': None, 'topComments': {'positive': [], 'negative': []}},
+                    'participation': {'base64': None}
                 }
         
         # Return result

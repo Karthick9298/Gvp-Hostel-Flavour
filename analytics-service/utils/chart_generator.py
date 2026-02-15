@@ -29,9 +29,8 @@ plt.rcParams['font.family'] = 'sans-serif'
 plt.rcParams['font.size'] = 11
 
 class ChartGenerator:
-    def __init__(self, output_dir='output'):
-        self.output_dir = output_dir
-        
+    def __init__(self):
+        """Initialize chart generator for in-memory base64 generation (no file storage)"""
         # Modern gradient color schemes matching frontend
         self.meal_colors = {
             'Breakfast': '#f59e0b',   # Amber-500
@@ -61,6 +60,17 @@ class ChartGenerator:
         self.text_primary = '#e2e8f0' # Gray-200
         self.text_secondary = '#cbd5e1' # Gray-300
     
+    def encode_to_base64(self, fig):
+        """Convert figure to base64 encoding without saving to disk"""
+        buffer = BytesIO()
+        fig.savefig(buffer, format='png', dpi=150, bbox_inches='tight', 
+                   facecolor='#0f172a', transparent=False)
+        buffer.seek(0)
+        image_base64 = base64.b64encode(buffer.read()).decode('utf-8')
+        plt.close(fig)
+        # Return with data URI prefix for HTML img tags
+        return f'data:image/png;base64,{image_base64}'
+    
     def analyze_comment_sentiment(self, comment):
         """Analyze sentiment of a single comment using TextBlob"""
         try:
@@ -76,39 +86,18 @@ class ChartGenerator:
                 return 'neutral', polarity
         except:
             return 'neutral', 0.0
-    
-    def get_date_dir(self, date_str):
-        """Get and create directory for specific date"""
-        date_dir = os.path.join(self.output_dir, 'daily', date_str)
-        os.makedirs(date_dir, exist_ok=True)
-        return date_dir
-    
-    def save_and_encode(self, fig, filepath):
-        """Save figure to file and return base64 encoding with dark theme"""
-        # Save to file with dark background
-        fig.savefig(filepath, dpi=150, bbox_inches='tight', 
-                   facecolor='#0f172a', edgecolor='none', 
-                   transparent=False)
-        
-        # Convert to base64
-        buffer = BytesIO()
-        fig.savefig(buffer, format='png', dpi=150, bbox_inches='tight', 
-                   facecolor='#0f172a', transparent=False)
-        buffer.seek(0)
-        image_base64 = base64.b64encode(buffer.read()).decode('utf-8')
-        plt.close(fig)
         
         return {
             'path': filepath,
             'base64': f'data:image/png;base64,{image_base64}'
         }
     
-    def generate_avg_ratings_chart(self, data, date_str):
-        """Generate modern average ratings bar chart with gradient effects"""
+    def generate_avg_ratings_chart(self, data):
+        """Generate modern average ratings bar chart with gradient effects (base64 only)"""
         meal_data = data.get('averageRatingPerMeal', {})
         
         if not meal_data or all(v == 0 for v in meal_data.values()):
-            return {'path': None, 'base64': None}
+            return None
         
         fig, ax = plt.subplots(figsize=(14, 8))
         fig.patch.set_facecolor(self.bg_darker)
@@ -196,16 +185,15 @@ class ChartGenerator:
         
         plt.tight_layout()
         
-        filepath = os.path.join(self.get_date_dir(date_str), 'avg_ratings.png')
-        return self.save_and_encode(fig, filepath)
+        return self.encode_to_base64(fig)
     
-    def generate_rating_distribution_chart(self, data, date_str):
-        """Generate 4 modern bar charts for rating distribution - one per meal"""
+    def generate_rating_distribution_chart(self, data):
+        """Generate 4 modern bar charts for rating distribution - one per meal (base64 only)"""
+        distribution_data = data.get('feedbackDistributionPerMeal', {})
         distribution_data = data.get('feedbackDistributionPerMeal', {})
         
         if not distribution_data:
-            return {'path': None, 'base64': None}
-        
+            return None
         # Create 2x2 subplot layout
         fig, axes = plt.subplots(2, 2, figsize=(18, 14))
         fig.patch.set_facecolor(self.bg_darker)
@@ -286,16 +274,15 @@ class ChartGenerator:
         
         plt.tight_layout()
         
-        filepath = os.path.join(self.get_date_dir(date_str), 'rating_distribution.png')
-        return self.save_and_encode(fig, filepath)
+        return self.encode_to_base64(fig)
     
-    def generate_sentiment_chart(self, data, date_str):
-        """Generate modern sentiment analysis with NLP-based donut chart"""
+    def generate_sentiment_chart(self, data):
+        """Generate modern sentiment analysis with NLP-based donut chart (base64 only)"""
         sentiment_data = data.get('sentimentAnalysisPerMeal', {})
         all_comments = data.get('allComments', [])
         
         if not sentiment_data:
-            return {'path': None, 'base64': None, 'topComments': {}}
+            return None
         
         # Analyze all comments with NLP if available
         if all_comments:
@@ -422,27 +409,37 @@ class ChartGenerator:
         
         plt.tight_layout()
         
-        filepath = os.path.join(self.get_date_dir(date_str), 'sentiment_analysis.png')
-        result = self.save_and_encode(fig, filepath)
-        
-        # Add top comments to result
-        result['topComments'] = {
-            'positive': [{'text': c['text'], 'meal': c['meal'], 'rating': c['rating']} 
-                        for c in positive_comments],
-            'negative': [{'text': c['text'], 'meal': c['meal'], 'rating': c['rating']} 
-                        for c in negative_comments]
+        # Return both the chart and the top comments data
+        return {
+            'base64': self.encode_to_base64(fig),
+            'topComments': {
+                'positive': [
+                    {
+                        'text': c['text'],
+                        'meal': c['meal'],
+                        'rating': c['rating'],
+                        'polarity': c['polarity']
+                    } for c in positive_comments
+                ],
+                'negative': [
+                    {
+                        'text': c['text'],
+                        'meal': c['meal'],
+                        'rating': c['rating'],
+                        'polarity': c['polarity']
+                    } for c in negative_comments
+                ]
+            }
         }
-        
-        return result
     
-    def generate_participation_chart(self, data, date_str):
-        """Generate modern participation rate visualization with dark theme"""
+    def generate_participation_chart(self, data):
+        """Generate modern participation rate visualization with dark theme (base64 only)"""
         overview = data.get('overview', {})
         total_students = overview.get('totalStudents', 0)
         participating = overview.get('participatingStudents', 0)
         
         if total_students == 0:
-            return {'path': None, 'base64': None}
+            return None
         
         fig = plt.figure(figsize=(14, 9))
         fig.patch.set_facecolor(self.bg_darker)
@@ -519,14 +516,15 @@ Quality Score: {overview.get('qualityConsistencyScore', 0):.0f}/100
         
         plt.tight_layout()
         
-        filepath = os.path.join(self.get_date_dir(date_str), 'participation.png')
-        return self.save_and_encode(fig, filepath)
+        return self.encode_to_base64(fig)
     
-    def generate_all_charts(self, data, date_str):
-        """Generate all charts and return their paths and base64 data"""
+    def generate_all_charts(self, data):
+        """Generate all charts and return base64 data only (no file storage)"""
+        sentiment_chart_data = self.generate_sentiment_chart(data)
+        
         return {
-            'avgRatings': self.generate_avg_ratings_chart(data, date_str),
-            'distribution': self.generate_rating_distribution_chart(data, date_str),
-            'sentiment': self.generate_sentiment_chart(data, date_str),
-            'participation': self.generate_participation_chart(data, date_str)
+            'avgRatings': {'base64': self.generate_avg_ratings_chart(data)},
+            'distribution': {'base64': self.generate_rating_distribution_chart(data)},
+            'sentiment': sentiment_chart_data if sentiment_chart_data else {'base64': None, 'topComments': {'positive': [], 'negative': []}},
+            'participation': {'base64': self.generate_participation_chart(data)}
         }

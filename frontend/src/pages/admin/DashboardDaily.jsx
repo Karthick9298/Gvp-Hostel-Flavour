@@ -40,12 +40,27 @@ const DailyAnalysisDashboard = () => {
 
       const data = await analyticsAPI.getDailyAnalysis(selectedDate);
 
+      console.log('=== RECEIVED DATA FROM API ===');
+      console.log('Status:', data.status);
+      console.log('Has charts:', 'charts' in data);
+      if (data.charts) {
+        console.log('Charts keys:', Object.keys(data.charts));
+        console.log('Sentiment chart:', data.charts.sentiment);
+        console.log('Has topComments:', data.charts.sentiment?.topComments);
+        if (data.charts.sentiment?.topComments) {
+          console.log('Positive comments count:', data.charts.sentiment.topComments.positive?.length);
+          console.log('Negative comments count:', data.charts.sentiment.topComments.negative?.length);
+        }
+      }
+
       if (data.status === 'success') {
         // Include charts from response along with data
         const mergedData = {
           ...data.data,
           charts: data.charts
         };
+        console.log('=== MERGED DATA ===');
+        console.log('Merged data charts:', mergedData.charts);
         setDailyData(mergedData);
         toast.success('Analysis completed successfully!');
       } else if (data.status === 'no_data') {
