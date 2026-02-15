@@ -213,31 +213,41 @@ const DailyAnalysisDashboard = () => {
         </div>
 
         <div className="bg-navy-800 rounded-2xl shadow-xl border border-navy-700 overflow-hidden">
-          <div className="p-6 sm:p-8">
-            <div className="space-y-8">
-              {/* Date Selector */}
-              <div className="flex items-center justify-between">
+          <div className="p-4 sm:p-6 lg:p-8">
+            <div className="space-y-6 sm:space-y-8">
+              {/* Date Selector - Responsive Layout */}
+              <div className="space-y-4">
+                {/* Header */}
                 <div>
-                  <h2 className="text-3xl font-bold text-gray-100">Daily Analysis</h2>
-                  <p className="text-gray-400 mt-1">Select a date and click 'Analyze' to view insights</p>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-100">Daily Analysis</h2>
+                  <p className="text-gray-400 mt-1 text-sm sm:text-base">Select a date and click 'Analyze' to view insights</p>
                 </div>
-                <div className="flex items-center space-x-4">
-                  <label className="text-sm font-medium text-gray-300">Analysis Date:</label>
-                  <div className="relative">
-                    <input
-                      type="date"
-                      value={selectedDate}
-                      onChange={(e) => setSelectedDate(e.target.value)}
-                      max={new Date(Date.now() - 86400000).toISOString().split('T')[0]}
-                      className="px-4 py-3 bg-navy-900 border border-navy-700 text-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
-                      disabled={loading}
-                    />
-                    <FaCalendarAlt className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+                
+                {/* Controls - Stack on mobile, side-by-side on desktop */}
+                <div className="flex flex-col sm:flex-row sm:items-end gap-3 sm:gap-4">
+                  {/* Date Input with Label */}
+                  <div className="flex-1">
+                    <label className="text-sm font-medium text-gray-300 mb-2 block">
+                      Analysis Date
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="date"
+                        value={selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                        max={new Date(Date.now() - 86400000).toISOString().split('T')[0]}
+                        className="w-full px-4 py-3 bg-navy-900 border border-navy-700 text-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm text-base transition-all hover:border-indigo-600"
+                        disabled={loading}
+                      />
+                      <FaCalendarAlt className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+                    </div>
                   </div>
+                  
+                  {/* Analyze Button */}
                   <button
                     onClick={handleAnalyzeClick}
                     disabled={loading || !selectedDate}
-                    className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-700 hover:to-purple-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl flex items-center space-x-2"
+                    className="w-full sm:w-auto sm:min-w-[200px] px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-700 hover:to-purple-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-navy-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center space-x-2 text-base"
                   >
                     {loading ? (
                       <>

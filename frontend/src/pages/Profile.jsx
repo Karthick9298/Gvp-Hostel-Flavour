@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { userAPI } from '../config/api';
-import { useAuth } from '../contexts/AuthContextClean';
+import { useAuth } from '../contexts/AuthContext';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import { FaUser, FaEdit, FaSave, FaTimes } from 'react-icons/fa';
+import { FaUser, FaEdit, FaSave, FaTimes, FaEnvelope, FaIdCard, FaDoorOpen, FaShieldAlt, FaCalendar, FaClock } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
 const Profile = () => {
@@ -75,132 +75,176 @@ const Profile = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="text-center">
-        <div className="w-20 h-20 bg-primary-900/40 border-2 border-primary-700/40 rounded-full flex items-center justify-center mx-auto mb-4">
-          <FaUser className="text-3xl text-primary-400" />
-        </div>
-        <h1 className="text-2xl font-bold text-gray-100">Profile</h1>
-        <p className="text-gray-400">Manage your account information</p>
-      </div>
-
-      {/* Profile Form */}
-      <div className="card">
-        <div className="card-header flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-gray-200">Personal Information</h2>
-          {!isEditing ? (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="btn-secondary flex items-center space-x-2"
-            >
-              <FaEdit />
-              <span>Edit</span>
-            </button>
-          ) : (
-            <div className="flex space-x-2">
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                className="btn-success flex items-center space-x-2"
-              >
-                <FaSave />
-                <span>{saving ? 'Saving...' : 'Save'}</span>
-              </button>
-              <button
-                onClick={handleCancel}
-                disabled={saving}
-                className="btn-secondary flex items-center space-x-2"
-              >
-                <FaTimes />
-                <span>Cancel</span>
-              </button>
-            </div>
-          )}
-        </div>
-
-        <div className="card-body space-y-4">
-          {/* Name */}
-          <div>
-            <label className="form-label">Full Name</label>
-            {isEditing ? (
-              <input
-                type="text"
-                name="name"
-                value={profileData.name}
-                onChange={handleInputChange}
-                className="form-input"
-                placeholder="Enter your full name"
-              />
-            ) : (
-              <p className="text-gray-200 py-2">{profileData.name}</p>
-            )}
+    <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+      {/* Header with Avatar */}
+      <div className="bg-navy-800 rounded-2xl p-6 border border-navy-700 shadow-xl">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+          {/* Avatar */}
+          <div className="w-24 h-24 bg-gradient-to-br from-primary-600 to-primary-800 rounded-full flex items-center justify-center shadow-lg flex-shrink-0">
+            <FaUser className="text-4xl text-white" />
           </div>
-
-          {/* Email (readonly) */}
-          <div>
-            <label className="form-label">Email Address</label>
-            <p className="text-gray-200 py-2">{profileData.email}</p>
-            <p className="text-xs text-gray-500">Email cannot be changed</p>
-          </div>
-
-          {/* Roll Number (readonly) */}
-          <div>
-            <label className="form-label">Roll Number</label>
-            <p className="text-gray-200 py-2">{profileData.rollNumber}</p>
-            <p className="text-xs text-gray-500">Roll number cannot be changed</p>
-          </div>
-
-          {/* Hostel Room */}
-          <div>
-            <label className="form-label">Hostel Room</label>
-            {isEditing ? (
-              <input
-                type="text"
-                name="hostelRoom"
-                value={profileData.hostelRoom}
-                onChange={handleInputChange}
-                className="form-input"
-                placeholder="e.g., A-101, B-205"
-              />
-            ) : (
-              <p className="text-gray-200 py-2">{profileData.hostelRoom}</p>
-            )}
-          </div>
-
-          {/* Account Type */}
-          <div>
-            <label className="form-label">Account Type</label>
-            <div className="flex items-center space-x-2 py-2">
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+          
+          {/* User Info */}
+          <div className="flex-1 text-center sm:text-left">
+            <h1 className="text-3xl font-bold text-gray-100">{profileData.name}</h1>
+            <p className="text-gray-400 mt-1">{profileData.email}</p>
+            
+            {/* Role Badge */}
+            <div className="mt-3">
+              <span className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium ${
                 user?.isAdmin 
                   ? 'bg-purple-900/30 text-purple-400 border border-purple-700/30' 
                   : 'bg-blue-900/30 text-blue-400 border border-blue-700/30'
               }`}>
+                <FaShieldAlt className="text-xs" />
                 {user?.isAdmin ? 'Administrator' : 'Student'}
               </span>
+            </div>
+          </div>
+          
+          {/* Edit Button */}
+          <div className="flex-shrink-0">
+            {!isEditing ? (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="px-6 py-2.5 bg-navy-700 hover:bg-navy-600 text-gray-200 font-medium rounded-lg transition-all border border-navy-600 flex items-center gap-2"
+              >
+                <FaEdit />
+                <span>Edit Profile</span>
+              </button>
+            ) : (
+              <div className="flex gap-2">
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="px-5 py-2.5 bg-success-600 hover:bg-success-700 text-white font-medium rounded-lg transition-all flex items-center gap-2 disabled:opacity-50"
+                >
+                  <FaSave />
+                  <span>{saving ? 'Saving...' : 'Save'}</span>
+                </button>
+                <button
+                  onClick={handleCancel}
+                  disabled={saving}
+                  className="px-5 py-2.5 bg-navy-700 hover:bg-navy-600 text-gray-200 font-medium rounded-lg transition-all border border-navy-600 flex items-center gap-2"
+                >
+                  <FaTimes />
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Profile Details Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Personal Information */}
+        <div className="bg-navy-800 rounded-xl p-6 border border-navy-700">
+          <h2 className="text-lg font-semibold text-gray-100 mb-4 flex items-center gap-2">
+            <FaUser className="text-primary-400" />
+            Personal Information
+          </h2>
+          <div className="space-y-4">
+            {/* Name */}
+            <div>
+              <label className="text-sm font-medium text-gray-400 block mb-1.5">Full Name</label>
+              {isEditing ? (
+                <input
+                  type="text"
+                  name="name"
+                  value={profileData.name}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2.5 bg-navy-900 border border-navy-700 rounded-lg text-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                  placeholder="Enter your full name"
+                />
+              ) : (
+                <p className="text-gray-200 font-medium py-2">{profileData.name}</p>
+              )}
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="text-sm font-medium text-gray-400 block mb-1.5 flex items-center gap-2">
+                <FaEnvelope className="text-xs" />
+                Email Address
+              </label>
+              <p className="text-gray-200 font-medium py-2">{profileData.email}</p>
+              <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Hostel Information */}
+        <div className="bg-navy-800 rounded-xl p-6 border border-navy-700">
+          <h2 className="text-lg font-semibold text-gray-100 mb-4 flex items-center gap-2">
+            <FaDoorOpen className="text-accent-400" />
+            Hostel Information
+          </h2>
+          <div className="space-y-4">
+            {/* Roll Number */}
+            <div>
+              <label className="text-sm font-medium text-gray-400 block mb-1.5 flex items-center gap-2">
+                <FaIdCard className="text-xs" />
+                Roll Number
+              </label>
+              <p className="text-gray-200 font-medium py-2">{profileData.rollNumber}</p>
+              <p className="text-xs text-gray-500 mt-1">Roll number cannot be changed</p>
+            </div>
+
+            {/* Hostel Room */}
+            <div>
+              <label className="text-sm font-medium text-gray-400 block mb-1.5">Room Number</label>
+              {isEditing ? (
+                <input
+                  type="text"
+                  name="hostelRoom"
+                  value={profileData.hostelRoom}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2.5 bg-navy-900 border border-navy-700 rounded-lg text-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                  placeholder="e.g., A-101, B-205"
+                />
+              ) : (
+                <p className="text-gray-200 font-medium py-2">{profileData.hostelRoom}</p>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Account Stats */}
-      <div className="card">
-        <div className="card-header">
-          <h2 className="text-lg font-semibold text-gray-200">Account Information</h2>
-        </div>
-        <div className="card-body">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <div>
-              <span className="text-gray-400">Member since:</span>
-              <p className="font-medium text-gray-200">
-                {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
-              </p>
+      {/* Account Activity */}
+      <div className="bg-navy-800 rounded-xl p-6 border border-navy-700">
+        <h2 className="text-lg font-semibold text-gray-100 mb-4 flex items-center gap-2">
+          <FaClock className="text-success-400" />
+          Account Activity
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="flex items-center gap-4 p-4 bg-navy-900/50 rounded-lg border border-navy-700/50">
+            <div className="p-3 bg-primary-900/30 rounded-lg">
+              <FaCalendar className="text-primary-400 text-xl" />
             </div>
             <div>
-              <span className="text-gray-400">Last login:</span>
-              <p className="font-medium text-gray-200">
-                {user?.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'N/A'}
+              <p className="text-sm text-gray-400">Member Since</p>
+              <p className="text-gray-200 font-semibold">
+                {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                }) : 'N/A'}
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-4 p-4 bg-navy-900/50 rounded-lg border border-navy-700/50">
+            <div className="p-3 bg-success-900/30 rounded-lg">
+              <FaClock className="text-success-400 text-xl" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-400">Last Login</p>
+              <p className="text-gray-200 font-semibold">
+                {user?.lastLogin ? new Date(user.lastLogin).toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                }) : 'N/A'}
               </p>
             </div>
           </div>

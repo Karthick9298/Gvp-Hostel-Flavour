@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaStar } from 'react-icons/fa';
+import { FaStar, FaRegStar } from 'react-icons/fa';
 
 const StarRating = ({ 
   rating = 0, 
@@ -12,8 +12,8 @@ const StarRating = ({
 
   const sizeClasses = {
     sm: 'text-lg',
-    md: 'text-xl',
-    lg: 'text-2xl'
+    md: 'text-2xl',
+    lg: 'text-3xl'
   };
 
   const handleClick = (value) => {
@@ -34,26 +34,53 @@ const StarRating = ({
     }
   };
 
+  const currentRating = hoverRating || rating;
+
   return (
-    <div className="flex items-center gap-2">
-      <div className="star-rating">
-        {[1, 2, 3, 4, 5].map((value) => (
-          <FaStar
-            key={value}
-            className={`
-              star ${sizeClasses[size]}
-              ${(hoverRating || rating) >= value ? 'filled' : 'empty'}
-              ${readonly ? 'cursor-default' : 'cursor-pointer'}
-            `}
-            onClick={() => handleClick(value)}
-            onMouseEnter={() => handleMouseEnter(value)}
-            onMouseLeave={handleMouseLeave}
-          />
-        ))}
+    <div className="flex items-center gap-3">
+      <div className="flex gap-1">
+        {[1, 2, 3, 4, 5].map((value) => {
+          const isFilled = currentRating >= value;
+          
+          return (
+            <button
+              key={value}
+              type="button"
+              className={`
+                ${sizeClasses[size]}
+                transition-all duration-200 transform
+                ${readonly ? 'cursor-default' : 'cursor-pointer hover:scale-110'}
+                ${!readonly && 'active:scale-95'}
+                focus:outline-none
+              `}
+              onClick={() => handleClick(value)}
+              onMouseEnter={() => handleMouseEnter(value)}
+              onMouseLeave={handleMouseLeave}
+              disabled={readonly}
+            >
+              {isFilled ? (
+                <FaStar 
+                  className={`
+                    ${readonly ? 'text-accent-500' : 'text-accent-400'}
+                    drop-shadow-[0_0_8px_rgba(251,177,47,0.5)]
+                    ${!readonly && hoverRating >= value && 'animate-pulse'}
+                  `}
+                />
+              ) : (
+                <FaRegStar 
+                  className={`
+                    ${readonly ? 'text-navy-600' : 'text-navy-500'}
+                    ${!readonly && 'hover:text-accent-400/50'}
+                  `}
+                />
+              )}
+            </button>
+          );
+        })}
       </div>
       {showValue && (
-        <span className="text-sm text-gray-600 ml-2">
-          {(hoverRating || rating).toFixed(1)}
+        <span className="text-base font-semibold text-accent-400 bg-navy-800/50 px-3 py-1 rounded-full border border-accent-500/30">
+          {currentRating.toFixed(1)}
         </span>
       )}
     </div>

@@ -131,7 +131,9 @@ router.post('/register', [
         rollNumber: user.rollNumber,
         hostelRoom: user.hostelRoom,
         isAdmin: user.isAdmin,
-        firebaseUid: user.firebaseUid
+        firebaseUid: user.firebaseUid,
+        createdAt: user.createdAt,
+        lastLogin: user.lastLogin
       };
 
       res.status(201).json({
@@ -238,7 +240,9 @@ router.post('/login', [
         rollNumber: user.rollNumber,
         hostelRoom: user.hostelRoom,
         isAdmin: user.isAdmin,
-        firebaseUid: user.firebaseUid
+        firebaseUid: user.firebaseUid,
+        createdAt: user.createdAt,
+        lastLogin: user.lastLogin
       };
 
       res.json({
@@ -352,7 +356,9 @@ router.post('/google-login', [
       rollNumber: user.rollNumber,
       hostelRoom: user.hostelRoom,
       isAdmin: user.isAdmin,
-      firebaseUid: user.firebaseUid
+      firebaseUid: user.firebaseUid,
+      createdAt: user.createdAt,
+      lastLogin: user.lastLogin
     };
 
     res.json({
@@ -424,6 +430,7 @@ router.post('/sync-user', async (req, res) => {
       rollNumber: user.rollNumber,
       hostelRoom: user.hostelRoom,
       isAdmin: user.isAdmin,
+      createdAt: user.createdAt,
       lastLogin: user.lastLogin
     };
 
@@ -455,6 +462,7 @@ router.get('/me', authenticateFirebaseToken, async (req, res) => {
       rollNumber: req.user.rollNumber,
       hostelRoom: req.user.hostelRoom,
       isAdmin: req.user.isAdmin,
+      createdAt: req.user.createdAt,
       lastLogin: req.user.lastLogin
     };
 

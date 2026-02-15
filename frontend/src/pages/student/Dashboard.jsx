@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { feedbackAPI, menuAPI } from '../../config/api';
-import { useAuth } from '../../contexts/AuthContextClean';
+import { useAuth } from '../../contexts/AuthContext';
 import StarRating from '../../components/common/StarRating';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import '../../styles/dashboard-animations.css';
