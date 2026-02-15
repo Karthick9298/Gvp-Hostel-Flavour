@@ -87,6 +87,7 @@ export default {
         'slide-up': 'slideUp 0.3s ease-out',
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'spin-slow': 'spin 3s linear infinite',
+        'bounce-fast': 'bounceFast 0.6s infinite', // faster speed
       },
       keyframes: {
         fadeIn: {
@@ -101,6 +102,16 @@ export default {
       animationDelay: {
         '200': '200ms',
         '400': '400ms',
+      },
+      keyframes: {
+        bounceFast: {
+          '0%, 100%': {
+            transform: 'translateY(0)',
+          },
+          '50%': {
+            transform: 'translateY(-18px)', // increase vertical height
+          },
+        },
       },
     },
   },

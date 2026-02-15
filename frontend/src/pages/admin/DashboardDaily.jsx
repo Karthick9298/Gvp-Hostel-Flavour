@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import { 
-  FaChartBar, 
-  FaUsers, 
+import { analyticsAPI } from '../../config/api';
+import {
+  FaChartBar,
+  FaUsers,
   FaComments,
   FaCalendarAlt,
   FaStar,
@@ -27,21 +28,6 @@ const DailyAnalysisDashboard = () => {
     return yesterday.toISOString().split('T')[0];
   });
 
-  // DEBUG: Log whenever dailyData changes
-  useEffect(() => {
-    if (dailyData) {
-      console.log('=== DAILY DATA STATE UPDATED ===');
-      console.log('Has charts in state:', 'charts' in dailyData);
-      if (dailyData.charts) {
-        console.log('Charts keys in state:', Object.keys(dailyData.charts));
-        console.log('avgRatings exists:', !!dailyData.charts.avgRatings);
-        console.log('avgRatings.base64 exists:', !!dailyData.charts.avgRatings?.base64);
-      } else {
-        console.log('❌ NO CHARTS IN STATE!');
-      }
-    }
-  }, [dailyData]);
-
   const handleAnalyzeClick = async () => {
     if (!selectedDate) {
       toast.error('Please select a date');
@@ -51,35 +37,17 @@ const DailyAnalysisDashboard = () => {
     try {
       setLoading(true);
       setDailyData(null);
-      const apiBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/+$/, '');
-      const response = await fetch(`${apiBaseUrl}/analytics/daily/${selectedDate}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('firebaseToken')}`
-        }
-      });
-      const data = await response.json();
-      
-      // DEBUG: Log complete response
-      console.log('=== API RESPONSE DEBUG ===');
-      console.log('Response keys:', Object.keys(data));
-      console.log('Has charts in response:', 'charts' in data);
-      if (data.charts) {
-        console.log('Charts keys:', Object.keys(data.charts));
-        console.log('avgRatings has base64:', data.charts.avgRatings?.base64?.substring(0, 50));
-      } else {
-        console.log('❌ NO CHARTS IN RESPONSE!');
-      }
-      
+
+      const data = await analyticsAPI.getDailyAnalysis(selectedDate);
+
       if (data.status === 'success') {
         // Include charts from response along with data
         const mergedData = {
           ...data.data,
           charts: data.charts
         };
-        console.log('=== SETTING STATE ===');
-        console.log('Has charts in merged data:', 'charts' in mergedData);
-        console.log('Charts keys in merged data:', mergedData.charts ? Object.keys(mergedData.charts) : 'NO CHARTS');
         setDailyData(mergedData);
+        toast.success('Analysis completed successfully!');
       } else if (data.status === 'no_data') {
         setDailyData({
           type: data.type,
@@ -91,13 +59,14 @@ const DailyAnalysisDashboard = () => {
             overallRating: 0
           }
         });
+        toast.info(data.message || 'No feedback data available for this date');
       } else {
-        console.error('Error in daily analysis:', data.message);
         toast.error(data.message || 'Failed to fetch daily data');
       }
     } catch (error) {
-      console.error('Error fetching daily data:', error);
-      toast.error('Failed to fetch daily analysis data');
+      console.error('Error in daily analysis:', error.message);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch daily analysis data';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -121,7 +90,7 @@ const DailyAnalysisDashboard = () => {
           <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden animate-fadeIn border border-primary-800/30">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white bg-opacity-10 rounded-full -mr-16 -mt-16"></div>
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-white bg-opacity-5 rounded-full -ml-12 -mb-12"></div>
-            
+
             <div className="relative">
               <div className="flex items-center space-x-4 sm:space-x-6">
                 <div className="p-3 sm:p-4 bg-white bg-opacity-20 rounded-2xl shadow-lg backdrop-blur-sm flex-shrink-0">
@@ -139,27 +108,15 @@ const DailyAnalysisDashboard = () => {
           <div className="bg-navy-800 rounded-2xl shadow-2xl border border-navy-700 p-8 sm:p-12 lg:p-16 relative overflow-hidden">
             {/* Animated Background Gradient */}
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/10 via-purple-900/10 to-pink-900/10 animate-pulse"></div>
-            
+
             <div className="relative flex flex-col items-center justify-center space-y-6">
-              {/* Enhanced Spinner */}
-              <div className="relative">
-                {/* Outer ring */}
-                <div className="absolute w-32 h-32 border-4 border-indigo-900/20 rounded-full"></div>
-                {/* Middle ring */}
-                <div className="absolute w-28 h-28 border-4 border-purple-900/30 rounded-full animate-spin" style={{animationDuration: '3s', top: '8px', left: '8px'}}></div>
-                {/* Inner spinning ring */}
-                <div className="w-24 h-24 border-8 border-navy-700 border-t-indigo-400 border-r-purple-400 rounded-full animate-spin shadow-lg shadow-indigo-900/50"></div>
-                {/* Center icon */}
-                <FaChartBar className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl text-indigo-400 animate-pulse" />
-              </div>
-              
               {/* Loading Text with Gradient */}
               <div className="text-center space-y-3">
                 <h3 className="text-3xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
                   Analyzing Data...
                 </h3>
                 <p className="text-gray-300 text-lg">Generating insights and visualizations for {selectedDate}</p>
-                
+
                 {/* Progress Indicators */}
                 <div className="mt-6 space-y-2">
                   <div className="flex items-center justify-center space-x-2 text-sm text-gray-400">
@@ -167,21 +124,31 @@ const DailyAnalysisDashboard = () => {
                     <span>Processing feedback data</span>
                   </div>
                   <div className="flex items-center justify-center space-x-2 text-sm text-gray-400">
-                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
                     <span>Creating visualizations</span>
                   </div>
                   <div className="flex items-center justify-center space-x-2 text-sm text-gray-400">
-                    <div className="w-2 h-2 bg-pink-400 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                    <div className="w-2 h-2 bg-pink-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
                     <span>Analyzing sentiment</span>
                   </div>
                 </div>
-                
+
                 {/* Animated Dots */}
                 <div className="mt-6 flex items-center justify-center space-x-2">
-                  <div className="w-3 h-3 bg-indigo-400 rounded-full animate-bounce shadow-lg shadow-indigo-500/50" style={{animationDelay: '0ms'}}></div>
-                  <div className="w-3 h-3 bg-purple-400 rounded-full animate-bounce shadow-lg shadow-purple-500/50" style={{animationDelay: '150ms'}}></div>
-                  <div className="w-3 h-3 bg-pink-400 rounded-full animate-bounce shadow-lg shadow-pink-500/50" style={{animationDelay: '300ms'}}></div>
+                  <div
+                    className="w-3 h-3 bg-indigo-400 rounded-full animate-bounce-fast shadow-lg shadow-indigo-500/50"
+                    style={{ animationDelay: "0ms" }}
+                  ></div>
+                  <div
+                    className="w-3 h-3 bg-purple-400 rounded-full animate-bounce-fast shadow-lg shadow-purple-500/50"
+                    style={{ animationDelay: "120ms" }}
+                  ></div>
+                  <div
+                    className="w-3 h-3 bg-pink-400 rounded-full animate-bounce-fast shadow-lg shadow-pink-500/50"
+                    style={{ animationDelay: "240ms" }}
+                  ></div>
                 </div>
+
               </div>
             </div>
           </div>
@@ -198,7 +165,7 @@ const DailyAnalysisDashboard = () => {
  text-white rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden animate-fadeIn border border-primary-800/30">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white bg-opacity-10 rounded-full -mr-16 -mt-16"></div>
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-white bg-opacity-5 rounded-full -ml-12 -mb-12"></div>
-          
+
           <div className="relative">
             <div className="flex items-center space-x-4 sm:space-x-6">
               <div className="p-3 sm:p-4 bg-white bg-opacity-20 rounded-2xl shadow-lg backdrop-blur-sm flex-shrink-0">
@@ -222,7 +189,7 @@ const DailyAnalysisDashboard = () => {
                   <h2 className="text-2xl sm:text-3xl font-bold text-gray-100">Daily Analysis</h2>
                   <p className="text-gray-400 mt-1 text-sm sm:text-base">Select a date and click 'Analyze' to view insights</p>
                 </div>
-                
+
                 {/* Controls - Stack on mobile, side-by-side on desktop */}
                 <div className="flex flex-col sm:flex-row sm:items-end gap-3 sm:gap-4">
                   {/* Date Input with Label */}
@@ -242,7 +209,7 @@ const DailyAnalysisDashboard = () => {
                       <FaCalendarAlt className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
                     </div>
                   </div>
-                  
+
                   {/* Analyze Button */}
                   <button
                     onClick={handleAnalyzeClick}
@@ -357,7 +324,7 @@ const DailyAnalysisDashboard = () => {
                           </div>
                         </div>
                         <div className="w-full bg-green-900 bg-opacity-40 rounded-full h-2">
-                          <div 
+                          <div
                             className="bg-green-200 h-2 rounded-full transition-all duration-1000"
                             style={{ width: `${dailyData.overview?.participationRate || 0}%` }}
                           ></div>
@@ -378,11 +345,11 @@ const DailyAnalysisDashboard = () => {
                           </div>
                         </div>
                         <div className="text-amber-100 text-sm">
-                          {(dailyData.overview?.qualityConsistencyScore || 0) >= 70 
-                            ? '🟢 Highly Consistent' 
-                            : (dailyData.overview?.qualityConsistencyScore || 0) >= 40 
-                            ? '🟡 Moderately Consistent' 
-                            : '🔴 Needs Improvement'}
+                          {(dailyData.overview?.qualityConsistencyScore || 0) >= 70
+                            ? '🟢 Highly Consistent'
+                            : (dailyData.overview?.qualityConsistencyScore || 0) >= 40
+                              ? '🟡 Moderately Consistent'
+                              : '🔴 Needs Improvement'}
                         </div>
                       </div>
                     </div>
@@ -403,11 +370,10 @@ const DailyAnalysisDashboard = () => {
                           {[1, 2, 3, 4, 5].map((star) => (
                             <FaStar
                               key={star}
-                              className={`text-lg ${
-                                star <= Math.round(dailyData.overview?.overallRating || 0) 
-                                  ? 'text-yellow-300' 
+                              className={`text-lg ${star <= Math.round(dailyData.overview?.overallRating || 0)
+                                  ? 'text-yellow-300'
                                   : 'text-purple-300'
-                              }`}
+                                }`}
                             />
                           ))}
                         </div>
@@ -422,7 +388,7 @@ const DailyAnalysisDashboard = () => {
                         <h3 className="text-2xl font-bold text-gray-100 mb-2">AI-Generated Visual Analysis</h3>
                         <p className="text-gray-400">Professional data visualizations using matplotlib & seaborn</p>
                       </div>
-                      
+
                       <div className="space-y-8">
                         {dailyData.charts.avgRatings?.base64 && (
                           <div className="bg-navy-800 rounded-2xl p-6 shadow-xl border border-navy-700">
@@ -431,8 +397,8 @@ const DailyAnalysisDashboard = () => {
                               <span>Average Ratings per Meal</span>
                             </h4>
                             <div className="flex justify-center">
-                              <img 
-                                src={dailyData.charts.avgRatings.base64} 
+                              <img
+                                src={dailyData.charts.avgRatings.base64}
                                 alt="Average Ratings per Meal"
                                 className="max-w-full h-auto rounded-lg shadow-md"
                               />
@@ -447,8 +413,8 @@ const DailyAnalysisDashboard = () => {
                               <span>Rating Distribution by Star</span>
                             </h4>
                             <div className="flex justify-center">
-                              <img 
-                                src={dailyData.charts.distribution.base64} 
+                              <img
+                                src={dailyData.charts.distribution.base64}
                                 alt="Rating Distribution"
                                 className="max-w-full h-auto rounded-lg shadow-md"
                               />
@@ -463,13 +429,13 @@ const DailyAnalysisDashboard = () => {
                               <span>Sentiment Analysis (NLP-Based)</span>
                             </h4>
                             <div className="flex justify-center">
-                              <img 
-                                src={dailyData.charts.sentiment.base64} 
+                              <img
+                                src={dailyData.charts.sentiment.base64}
                                 alt="Sentiment Analysis"
                                 className="max-w-full h-auto rounded-lg shadow-md"
                               />
                             </div>
-                            
+
                             {/* Display Top Comments if available */}
                             {dailyData.charts.sentiment.topComments && (
                               <div className="mt-6 grid md:grid-cols-2 gap-6">
@@ -491,7 +457,7 @@ const DailyAnalysisDashboard = () => {
                                     </div>
                                   </div>
                                 )}
-                                
+
                                 {/* Negative Comments */}
                                 {dailyData.charts.sentiment.topComments.negative?.length > 0 && (
                                   <div className="bg-red-900/20 rounded-lg p-4 border border-red-700/40">
@@ -522,8 +488,8 @@ const DailyAnalysisDashboard = () => {
                               <span>Student Participation Rate</span>
                             </h4>
                             <div className="flex justify-center">
-                              <img 
-                                src={dailyData.charts.participation.base64} 
+                              <img
+                                src={dailyData.charts.participation.base64}
                                 alt="Participation Rate"
                                 className="max-w-full h-auto rounded-lg shadow-md"
                               />
@@ -538,8 +504,8 @@ const DailyAnalysisDashboard = () => {
                               <span>Comment Word Cloud</span>
                             </h4>
                             <div className="flex justify-center">
-                              <img 
-                                src={dailyData.charts.wordcloud.base64} 
+                              <img
+                                src={dailyData.charts.wordcloud.base64}
                                 alt="Word Cloud"
                                 className="max-w-full h-auto rounded-lg shadow-md"
                               />

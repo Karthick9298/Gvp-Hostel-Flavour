@@ -12,11 +12,24 @@
 
 ### 🏗️ Architecture
 
-The project follows a **3-tier architecture**:
+The project follows a **microservices architecture**:
 
-- **`frontend/`** — React + Vite + Tailwind CSS (Student & Admin UI)
+- **`frontend/`** — React 19 + Vite + Tailwind CSS (Student & Admin UI)
 - **`backend/`** — Express.js + MongoDB + Firebase Auth (REST API)
-- **`analytics-service/`** — Python (Data Analysis & Chart Generation)
+- **`analytics-service/`** — FastAPI + Python (Independent Analytics Microservice)
+
+### Architecture Diagram
+```
+┌─────────────┐      ┌─────────────┐      ┌──────────────────┐
+│   Frontend  │─────▶│   Backend   │─────▶│    Analytics     │
+│   (React)   │      │  (Express)  │      │    (FastAPI)     │
+└─────────────┘      └──────┬──────┘      └────────┬─────────┘
+                            │                      │
+                            ▼                      ▼
+                     ┌─────────────────────────────┐
+                     │      MongoDB Database       │
+                     └─────────────────────────────┘
+```
 
 ## ✨ Features
 
@@ -56,17 +69,39 @@ status
 - **Styling:** Tailwind CSS
 ## 🚀 Quick Start
 
-### Prerequisites
-- **Node.js** 18+ ([Download](https://nodejs.org/))
-- **Python** 3.8+ ([Download](https://www.python.org/))
-- **MongoDB** 6+ ([Download](https://www.mongodb.com/try/download/community))
-- **Firebase Project** ([Create Project](https://console.firebase.google.com/))
+### 🐳 Docker Deployment (Recommended)
 
-### 📥 Clone Repository
+**Prerequisites:** Docker & Docker Compose installed
+
 ```bash
+# Clone repository
 git clone https://github.com/Karthick9298/Gvp-Hostel-Flavour.git
 cd Gvp-Hostel-Flavour
+
+# Configure environment
+cp backend/.env.example backend/.env
+cp analytics-service/.env.example analytics-service/.env
+# Edit .env files with your credentials
+
+# Start all services
+docker-compose up -d
+
+# Check status
+docker-compose ps
+
+# View logs
+docker-compose logs -f
 ```
+
+**Service URLs:**
+- Frontend: http://localhost:80
+- Backend: http://localhost:5000
+- Analytics: http://localhost:8000
+- Analytics API Docs: http://localhost:8000/docs
+
+### 💻 Local Development
+
+See detailed setup instructions in [DEPLOYMENT.md](DEPLOYMENT.md)
 ### Backend
 - **Runtime:** Node.js 18+
 - **Framework:** Express.js
@@ -76,47 +111,48 @@ cd Gvp-Hostel-Flavour
 - **Validation:** express-validator
 - **Timezone:** moment-timezone (IST support)
 
-### Analytics Service (Python)
+### Analytics Service (FastAPI)
+- **Framework:** FastAPI (Python 3.8+)
 - **Database Client:** pymongo
 - **Visualization:** matplotlib, seaborn
 - **NLP:** textblob (sentiment analysis)
-- **Environment:** python-dotenv
+- **Server:** Uvicorn (ASGI)
+- **API Docs:** Swagger UI, ReDoc
 
 ### Infrastructure
 - **Authentication:** Firebase Authentication
 - **Database:** MongoDB (local or Atlas)
 - **File Storage:** Local filesystem for chart outputs
 
-### 1️⃣ Backend Setup
+### 1️⃣ Analytics Service Setup (FastAPI)
 
 ```bash
-cd backend
-npm install
-```
+cd analytics-service
 
+# Quick start
+chmod +x start.sh
 Create `backend/.env`:
 ```env
 NODE_ENV=development
 PORT=5000
-CORS_ORIGIN=http://localhost:5174
+CORS_ORIGIN=http://localhost:5173
 
 # MongoDB Connection
 MONGODB_URI=mongodb://localhost:27017/hostel-food-analysis
 
+# Analytics Service URL
+ANALYTICS_API_URL=http://localhost:8000
+
 # Firebase Configuration
 FIREBASE_PROJECT_ID=your-firebase-project-id
-FIREBASE_SERVICE_ACCOUNT_PATH=./config/serviceAccountKey.json
-
-# Optional: AI Suggestions (Hugging Face)
-# HUGGINGFACE_API_KEY=your-hf-api-key
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk@your-project.iam.gserviceaccount.com
 ```
 
-**Firebase Setup:**
-1. Go to Firebase Console → Project Settings → Service Accounts
-2. Click "Generate New Private Key"
-3. Save as `backend/config/serviceAccountKey.json`
-### 2️⃣ Analytics Service (Python)
-
+**Start Backend:**
+```bash
+npm run dev
+```
 The backend uses the root Python virtual environment at `.venv/bin/python`.
 
 Create virtual environment and install dependencies:

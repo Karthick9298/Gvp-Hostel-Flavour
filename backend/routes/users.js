@@ -198,150 +198,150 @@ router.get('/:userId', [authenticateFirebaseToken, authenticateFirebaseToken], a
 // @route   PUT /api/users/:userId/admin
 // @desc    Toggle admin status (Admin only)
 // @access  Private/Admin
-router.put('/:userId/admin', [authenticateFirebaseToken, requireAdmin], async (req, res) => {
-  try {
-    const { isAdmin } = req.body;
+// router.put('/:userId/admin', [authenticateFirebaseToken, requireAdmin], async (req, res) => {
+//   try {
+//     const { isAdmin } = req.body;
 
-    if (typeof isAdmin !== 'boolean') {
-      return res.status(400).json({
-        status: 'error',
-        message: 'isAdmin must be a boolean value'
-      });
-    }
+//     if (typeof isAdmin !== 'boolean') {
+//       return res.status(400).json({
+//         status: 'error',
+//         message: 'isAdmin must be a boolean value'
+//       });
+//     }
 
-    const user = await User.findByIdAndUpdate(
-      req.params.userId,
-      { isAdmin },
-      { new: true, runValidators: true }
-    ).select('-firebaseUid -__v');
+//     const user = await User.findByIdAndUpdate(
+//       req.params.userId,
+//       { isAdmin },
+//       { new: true, runValidators: true }
+//     ).select('-firebaseUid -__v');
 
-    if (!user) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'User not found'
-      });
-    }
+//     if (!user) {
+//       return res.status(404).json({
+//         status: 'error',
+//         message: 'User not found'
+//       });
+//     }
 
-    res.json({
-      status: 'success',
-      message: `User ${isAdmin ? 'promoted to' : 'removed from'} admin successfully`,
-      data: {
-        user
-      }
-    });
+//     res.json({
+//       status: 'success',
+//       message: `User ${isAdmin ? 'promoted to' : 'removed from'} admin successfully`,
+//       data: {
+//         user
+//       }
+//     });
 
-  } catch (error) {
-    console.error('Toggle admin status error:', error);
-    res.status(500).json({
-      status: 'error',
-      message: 'Failed to update admin status',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
-  }
-});
+//   } catch (error) {
+//     console.error('Toggle admin status error:', error);
+//     res.status(500).json({
+//       status: 'error',
+//       message: 'Failed to update admin status',
+//       error: process.env.NODE_ENV === 'development' ? error.message : undefined
+//     });
+//   }
+// });
 
-// @route   PUT /api/users/:userId/status
-// @desc    Toggle user active status (Admin only)
-// @access  Private/Admin
-router.put('/:userId/status', [authenticateFirebaseToken, requireAdmin], async (req, res) => {
-  try {
-    const { isActive } = req.body;
+// // @route   PUT /api/users/:userId/status
+// // @desc    Toggle user active status (Admin only)
+// // @access  Private/Admin
+// router.put('/:userId/status', [authenticateFirebaseToken, requireAdmin], async (req, res) => {
+//   try {
+//     const { isActive } = req.body;
 
-    if (typeof isActive !== 'boolean') {
-      return res.status(400).json({
-        status: 'error',
-        message: 'isActive must be a boolean value'
-      });
-    }
+//     if (typeof isActive !== 'boolean') {
+//       return res.status(400).json({
+//         status: 'error',
+//         message: 'isActive must be a boolean value'
+//       });
+//     }
 
-    const user = await User.findByIdAndUpdate(
-      req.params.userId,
-      { isActive },
-      { new: true, runValidators: true }
-    ).select('-firebaseUid -__v');
+//     const user = await User.findByIdAndUpdate(
+//       req.params.userId,
+//       { isActive },
+//       { new: true, runValidators: true }
+//     ).select('-firebaseUid -__v');
 
-    if (!user) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'User not found'
-      });
-    }
+//     if (!user) {
+//       return res.status(404).json({
+//         status: 'error',
+//         message: 'User not found'
+//       });
+//     }
 
-    res.json({
-      status: 'success',
-      message: `User ${isActive ? 'activated' : 'deactivated'} successfully`,
-      data: {
-        user
-      }
-    });
+//     res.json({
+//       status: 'success',
+//       message: `User ${isActive ? 'activated' : 'deactivated'} successfully`,
+//       data: {
+//         user
+//       }
+//     });
 
-  } catch (error) {
-    console.error('Toggle user status error:', error);
-    res.status(500).json({
-      status: 'error',
-      message: 'Failed to update user status',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
-  }
-});
+//   } catch (error) {
+//     console.error('Toggle user status error:', error);
+//     res.status(500).json({
+//       status: 'error',
+//       message: 'Failed to update user status',
+//       error: process.env.NODE_ENV === 'development' ? error.message : undefined
+//     });
+//   }
+// });
 
-// @route   GET /api/users/stats/overview
-// @desc    Get user statistics overview (Admin only)
-// @access  Private/Admin
-router.get('/stats/overview', [authenticateFirebaseToken, requireAdmin], async (req, res) => {
-  try {
-    const totalUsers = await User.countDocuments({ isActive: true });
-    const totalAdmins = await User.countDocuments({ isActive: true, isAdmin: true });
-    const totalStudents = await User.countDocuments({ isActive: true, isAdmin: false });
-    const inactiveUsers = await User.countDocuments({ isActive: false });
+// // @route   GET /api/users/stats/overview
+// // @desc    Get user statistics overview (Admin only)
+// // @access  Private/Admin
+// router.get('/stats/overview', [authenticateFirebaseToken, requireAdmin], async (req, res) => {
+//   try {
+//     const totalUsers = await User.countDocuments({ isActive: true });
+//     const totalAdmins = await User.countDocuments({ isActive: true, isAdmin: true });
+//     const totalStudents = await User.countDocuments({ isActive: true, isAdmin: false });
+//     const inactiveUsers = await User.countDocuments({ isActive: false });
 
-    // Recent registrations (last 7 days)
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const recentRegistrations = await User.countDocuments({
-      createdAt: { $gte: sevenDaysAgo },
-      isActive: true
-    });
+//     // Recent registrations (last 7 days)
+//     const sevenDaysAgo = new Date();
+//     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+//     const recentRegistrations = await User.countDocuments({
+//       createdAt: { $gte: sevenDaysAgo },
+//       isActive: true
+//     });
 
-    // Users by hostel blocks
-    const blockStats = await User.aggregate([
-      { 
-        $match: { isActive: true, isAdmin: false } 
-      },
-      {
-        $group: {
-          _id: { $substr: ['$hostelRoom', 0, 1] }, // Extract first character (A or B)
-          count: { $sum: 1 }
-        }
-      },
-      {
-        $sort: { _id: 1 }
-      }
-    ]);
+//     // Users by hostel blocks
+//     const blockStats = await User.aggregate([
+//       { 
+//         $match: { isActive: true, isAdmin: false } 
+//       },
+//       {
+//         $group: {
+//           _id: { $substr: ['$hostelRoom', 0, 1] }, // Extract first character (A or B)
+//           count: { $sum: 1 }
+//         }
+//       },
+//       {
+//         $sort: { _id: 1 }
+//       }
+//     ]);
 
-    res.json({
-      status: 'success',
-      data: {
-        totalUsers,
-        totalAdmins,
-        totalStudents,
-        inactiveUsers,
-        recentRegistrations,
-        blockStats: blockStats.reduce((acc, block) => {
-          acc[`Block ${block._id}`] = block.count;
-          return acc;
-        }, {})
-      }
-    });
+//     res.json({
+//       status: 'success',
+//       data: {
+//         totalUsers,
+//         totalAdmins,
+//         totalStudents,
+//         inactiveUsers,
+//         recentRegistrations,
+//         blockStats: blockStats.reduce((acc, block) => {
+//           acc[`Block ${block._id}`] = block.count;
+//           return acc;
+//         }, {})
+//       }
+//     });
 
-  } catch (error) {
-    console.error('Get user stats error:', error);
-    res.status(500).json({
-      status: 'error',
-      message: 'Failed to get user statistics',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
-  }
-});
+//   } catch (error) {
+//     console.error('Get user stats error:', error);
+//     res.status(500).json({
+//       status: 'error',
+//       message: 'Failed to get user statistics',
+//       error: process.env.NODE_ENV === 'development' ? error.message : undefined
+//     });
+//   }
+// });
 
 export default router;

@@ -32,7 +32,7 @@ api.interceptors.response.use(
     // Handle common errors
     if (error.response?.status === 401) {
       // Unauthorized - remove token and redirect to login
-      localStorage.removeItem('firebaseToken');
+      localStorage.removeItem('authToken');
       if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
         window.location.href = '/login';
       }
@@ -63,6 +63,7 @@ export const feedbackAPI = {
 export const analyticsAPI = {
   getDashboard: (params) => api.get('/analytics/dashboard', { params }),
   getComments: (params) => api.get('/analytics/comments', { params }),
+  getDailyAnalysis: (date) => api.get(`/analytics/daily/${date}`),
 };
 
 export const userAPI = {

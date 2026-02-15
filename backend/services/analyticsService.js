@@ -1,101 +1,46 @@
-import { spawn } from 'child_process';
-import path from 'path';
-import fs from 'fs/promises';
-import { fileURLToPath } from 'url';
+import axios from 'axios';
+import dotenv from 'dotenv';
 
-// Get current directory for ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+dotenv.config();
 
 class AnalyticsService {
   constructor() {
-    this.analyticsPath = path.join(__dirname, '../../analytics-service');
-    // Use virtual environment Python from root .venv
-    this.pythonExecutable = path.join(__dirname, '../..', '.venv', 'bin', 'python');
+    // Analytics API base URL from environment variable
+    this.analyticsApiUrl = process.env.ANALYTICS_API_URL || 'http://localhost:8000';
   }
 
   /**
-   * Execute Python script and return parsed JSON result
-   */
-  async executePythonScript(scriptName, args = []) {
-    return new Promise((resolve, reject) => {
-      const scriptPath = path.join(this.analyticsPath, 'services', scriptName);
-      const process = spawn(this.pythonExecutable, [scriptPath, ...args]);
-      
-      let stdout = '';
-      let stderr = '';
-      
-      process.stdout.on('data', (data) => {
-        stdout += data.toString();
-      });
-      
-      process.stderr.on('data', (data) => {
-        stderr += data.toString();
-      });
-      
-      process.on('close', (code) => {
-        if (code !== 0) {
-          console.error(`Python script error (${scriptName}):`, stderr);
-          reject(new Error(`Python script failed with code ${code}: ${stderr}`));
-          return;
-        }
-        
-        try {
-          const result = JSON.parse(stdout);
-          resolve(result);
-        } catch (parseError) {
-          console.error('JSON parse error:', parseError);
-          console.error('Python output:', stdout);
-          reject(new Error(`Failed to parse Python script output: ${parseError.message}`));
-        }
-      });
-      
-      process.on('error', (error) => {
-        reject(new Error(`Failed to start Python script: ${error.message}`));
-      });
-      
-      // Set timeout for long-running processes
-      setTimeout(() => {
-        process.kill('SIGTERM');
-        reject(new Error('Python script timeout'));
-      }, 60000); // 60 second timeout
-    });
-  }
-
-  /**
-   * Get daily analysis for a specific date
+   * Get daily analysis for a specific date from FastAPI service
    */
   async getDailyAnalysis(dateString) {
     try {
-      console.log(`Fetching daily analysis for: ${dateString}`);
-      const result = await this.executePythonScript('daily_analysis.py', [dateString]);
+      console.log(`Fetching daily analysis from FastAPI for: ${dateString}`);
       
-      // DEBUG: Log what Python returned
-      console.log('=== PYTHON SCRIPT RESULT ===');
-      console.log('Result keys:', Object.keys(result));
-      console.log('Has charts from Python:', 'charts' in result);
-      if (result.charts) {
-        console.log('Charts keys from Python:', Object.keys(result.charts));
-      } else {
-        console.log('❌ NO CHARTS FROM PYTHON!');
-      }
+      const response = await axios.get(
+        `${this.analyticsApiUrl}/api/analytics/daily/${dateString}`,
+        {
+          params: {
+            include_charts: true
+          },
+          timeout: 60000 // 60 second timeout
+        }
+      );
       
-      // Handle different response types from Python script
+      const result = response.data;
+      
+      console.log('=== FASTAPI RESPONSE ===');
+      console.log('Status:', result.status);
+      console.log('Has charts:', 'charts' in result);
+      
+      // Handle different response types
       if (result.status === 'success') {
-        const returnValue = {
+        return {
           status: 'success',
           data: result.data,
-          charts: result.charts, // *** FIXED: Pass through charts ***
+          charts: result.charts,
           date: result.date,
-          timestamp: new Date().toISOString()
+          timestamp: result.timestamp || new Date().toISOString()
         };
-        
-        // DEBUG: Log what we're returning
-        console.log('=== SERVICE RETURN VALUE ===');
-        console.log('Return keys:', Object.keys(returnValue));
-        console.log('Has charts in return:', 'charts' in returnValue);
-        
-        return returnValue;
       } else if (result.status === 'no_data') {
         return {
           status: 'no_data',
@@ -103,16 +48,42 @@ class AnalyticsService {
           message: result.message,
           date: result.date,
           data: result.data || null,
-          charts: result.charts || null, // *** FIXED: Pass through charts even if no data ***
-          timestamp: new Date().toISOString()
+          charts: result.charts || null,
+          timestamp: result.timestamp || new Date().toISOString()
         };
-      } else if (result.error) {
-        throw new Error(result.message);
       }
       
       return result;
     } catch (error) {
-      console.error('Daily analysis error:', error);
+      console.error('Analytics API error:', error.message);
+      
+      // Handle network errors
+      if (error.code === 'ECONNREFUSED') {
+        return {
+          error: true,
+          message: 'Analytics service is not available. Please ensure it is running.',
+          data: null
+        };
+      }
+      
+      // Handle timeout errors
+      if (error.code === 'ETIMEDOUT' || error.code === 'ECONNABORTED') {
+        return {
+          error: true,
+          message: 'Analytics service timeout. Please try again.',
+          data: null
+        };
+      }
+      
+      // Handle HTTP errors
+      if (error.response) {
+        return {
+          error: true,
+          message: error.response.data?.detail || error.response.data?.message || 'Analytics service error',
+          data: null
+        };
+      }
+      
       return {
         error: true,
         message: `Daily analysis failed: ${error.message}`,
@@ -121,35 +92,35 @@ class AnalyticsService {
     }
   }
 
-  
   /**
-   * Install Python dependencies
+   * Check analytics service health
    */
-  async installPythonDependencies() {
-    return new Promise((resolve, reject) => {
-      const requirementsPath = path.join(this.analyticsPath, 'requirements.txt');
-      const process = spawn('pip', ['install', '-r', requirementsPath]);
+  async checkHealth() {
+    try {
+      const response = await axios.get(
+        `${this.analyticsApiUrl}/health`,
+        { timeout: 5000 }
+      );
       
-      let output = '';
-      
-      process.stdout.on('data', (data) => {
-        output += data.toString();
-      });
-      
-      process.stderr.on('data', (data) => {
-        output += data.toString();
-      });
-      
-      process.on('close', (code) => {
-        if (code === 0) {
-          resolve({ success: true, output });
-        } else {
-          reject(new Error(`pip install failed: ${output}`));
-        }
-      });
-    });
+      return {
+        available: true,
+        ...response.data
+      };
+    } catch (error) {
+      return {
+        available: false,
+        error: error.message
+      };
+    }
   }
 
+  /**
+   * Legacy method for compatibility - checks Python dependencies
+   * Now checks if FastAPI service is running
+   */
+  async checkPythonDependencies() {
+    return await this.checkHealth();
+  }
 }
 
 export default new AnalyticsService();

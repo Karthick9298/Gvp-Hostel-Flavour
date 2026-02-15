@@ -54,9 +54,7 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-// Serve static files for analytics charts
-const analyticsOutputPath = path.join(__dirname, '../analytics-service/output');
-app.use('/analytics-images', express.static(analyticsOutputPath));
+// Removed static file serving - charts are now served directly from analytics service
 
 // Health check endpoint
 app.get('/health', (req, res) => {

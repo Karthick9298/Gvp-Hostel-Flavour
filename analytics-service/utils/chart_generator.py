@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Chart Generation Utility - Creates visualizations for daily analysis
-Enhanced with beautiful UI and sentiment analysis
+Enhanced with modern dark theme matching the frontend UI
 """
 
 import os
@@ -14,38 +14,52 @@ import seaborn as sns
 import numpy as np
 from textblob import TextBlob
 
-# Set style for beautiful charts
-sns.set_theme(style="whitegrid")
-plt.rcParams['figure.facecolor'] = 'white'
-plt.rcParams['axes.facecolor'] = '#f8fafc'
+# Set modern dark theme to match frontend
+sns.set_theme(style="darkgrid")
+plt.rcParams['figure.facecolor'] = '#0f172a'  # Navy-950
+plt.rcParams['axes.facecolor'] = '#1e293b'    # Navy-900
+plt.rcParams['text.color'] = '#e2e8f0'        # Gray-200
+plt.rcParams['axes.labelcolor'] = '#e2e8f0'   # Gray-200
+plt.rcParams['axes.edgecolor'] = '#475569'    # Navy-600
+plt.rcParams['xtick.color'] = '#cbd5e1'       # Gray-300
+plt.rcParams['ytick.color'] = '#cbd5e1'       # Gray-300
+plt.rcParams['grid.color'] = '#334155'        # Navy-700
+plt.rcParams['grid.alpha'] = 0.3
 plt.rcParams['font.family'] = 'sans-serif'
-plt.rcParams['font.size'] = 10
+plt.rcParams['font.size'] = 11
 
 class ChartGenerator:
     def __init__(self, output_dir='output'):
         self.output_dir = output_dir
         
-        # Beautiful color schemes
+        # Modern gradient color schemes matching frontend
         self.meal_colors = {
-            'Breakfast': '#FF6B6B',
-            'Lunch': '#4ECDC4',
-            'Dinner': '#45B7D1',
-            'Night Snacks': '#FFA07A'
+            'Breakfast': '#f59e0b',   # Amber-500
+            'Lunch': '#3b82f6',       # Blue-500
+            'Snacks': '#8b5cf6',      # Purple-500
+            'Night': '#ec4899'        # Pink-500
         }
         
         self.rating_colors = {
-            1: '#EF4444',  # Red
-            2: '#F59E0B',  # Orange
-            3: '#FCD34D',  # Yellow
-            4: '#84CC16',  # Light Green
-            5: '#10B981'   # Green
+            1: '#ef4444',  # Red-500
+            2: '#f97316',  # Orange-500
+            3: '#fbbf24',  # Yellow-400
+            4: '#84cc16',  # Lime-500
+            5: '#10b981'   # Emerald-500
         }
         
         self.sentiment_colors = {
-            'positive': '#10B981',
-            'neutral': '#94A3B8',
-            'negative': '#EF4444'
+            'positive': '#10b981',  # Emerald-500
+            'neutral': '#64748b',   # Slate-500
+            'negative': '#ef4444'   # Red-500
         }
+        
+        # Dark theme colors
+        self.bg_dark = '#1e293b'      # Navy-900
+        self.bg_darker = '#0f172a'    # Navy-950
+        self.border_color = '#475569' # Navy-600
+        self.text_primary = '#e2e8f0' # Gray-200
+        self.text_secondary = '#cbd5e1' # Gray-300
     
     def analyze_comment_sentiment(self, comment):
         """Analyze sentiment of a single comment using TextBlob"""
@@ -70,13 +84,16 @@ class ChartGenerator:
         return date_dir
     
     def save_and_encode(self, fig, filepath):
-        """Save figure to file and return base64 encoding"""
-        # Save to file
-        fig.savefig(filepath, dpi=120, bbox_inches='tight', facecolor='white', edgecolor='none')
+        """Save figure to file and return base64 encoding with dark theme"""
+        # Save to file with dark background
+        fig.savefig(filepath, dpi=150, bbox_inches='tight', 
+                   facecolor='#0f172a', edgecolor='none', 
+                   transparent=False)
         
         # Convert to base64
         buffer = BytesIO()
-        fig.savefig(buffer, format='png', dpi=120, bbox_inches='tight', facecolor='white')
+        fig.savefig(buffer, format='png', dpi=150, bbox_inches='tight', 
+                   facecolor='#0f172a', transparent=False)
         buffer.seek(0)
         image_base64 = base64.b64encode(buffer.read()).decode('utf-8')
         plt.close(fig)
@@ -87,67 +104,95 @@ class ChartGenerator:
         }
     
     def generate_avg_ratings_chart(self, data, date_str):
-        """Generate beautiful average ratings bar chart with gradients"""
+        """Generate modern average ratings bar chart with gradient effects"""
         meal_data = data.get('averageRatingPerMeal', {})
         
         if not meal_data or all(v == 0 for v in meal_data.values()):
             return {'path': None, 'base64': None}
         
-        fig, ax = plt.subplots(figsize=(12, 7))
-        fig.patch.set_facecolor('white')
-        ax.set_facecolor('#f8fafc')
+        fig, ax = plt.subplots(figsize=(14, 8))
+        fig.patch.set_facecolor(self.bg_darker)
+        ax.set_facecolor(self.bg_dark)
         
         meals = list(meal_data.keys())
         ratings = list(meal_data.values())
         
-        # Create beautiful gradient bars
+        # Create gradient bars
         x_pos = np.arange(len(meals))
-        colors = [self.meal_colors.get(meal, '#60A5FA') for meal in meals]
+        colors = [self.meal_colors.get(meal, '#60a5fa') for meal in meals]
         
-        bars = ax.bar(x_pos, ratings, color=colors, alpha=0.85, 
-                      edgecolor='white', linewidth=2, width=0.6)
+        bars = ax.bar(x_pos, ratings, color=colors, alpha=0.9, 
+                      edgecolor='#334155', linewidth=2.5, width=0.65)
         
-        # Add rating value labels on top of bars with style
+        # Add glow effect with multiple bars
+        for bar, color in zip(bars, colors):
+            x = bar.get_x()
+            width = bar.get_width()
+            height = bar.get_height()
+            # Subtle glow
+            ax.bar(x, height, width=width, color=color, alpha=0.2, 
+                  edgecolor='none', linewidth=0)
+        
+        # Add rating badges on top
         for i, (bar, rating) in enumerate(zip(bars, ratings)):
             height = bar.get_height()
-            # Rating badge
-            ax.text(bar.get_x() + bar.get_width()/2., height + 0.15,
+            # Modern badge with shadow effect
+            bbox_props = dict(boxstyle='round,pad=0.6', 
+                            facecolor=colors[i], 
+                            edgecolor='#0f172a',
+                            linewidth=2.5,
+                            alpha=0.95)
+            ax.text(bar.get_x() + bar.get_width()/2., height + 0.2,
                    f'{rating:.1f}★', ha='center', va='bottom', 
-                   fontsize=14, fontweight='bold', color=colors[i],
-                   bbox=dict(boxstyle='round,pad=0.5', facecolor='white', 
-                            edgecolor=colors[i], linewidth=2))
+                   fontsize=15, fontweight='bold', color='white',
+                   bbox=bbox_props)
             
             # Add emoji based on rating
-            emoji = '😊' if rating >= 4 else '😐' if rating >= 3 else '😟'
+            emoji = '🌟' if rating >= 4.5 else '😊' if rating >= 4 else '😐' if rating >= 3 else '😟'
             ax.text(bar.get_x() + bar.get_width()/2., height/2,
-                   emoji, ha='center', va='center', fontsize=24)
+                   emoji, ha='center', va='center', fontsize=28)
         
-        # Styling
-        ax.set_ylabel('Average Rating', fontsize=13, fontweight='bold', color='#1e293b')
-        ax.set_xlabel('Meal Type', fontsize=13, fontweight='bold', color='#1e293b')
-        ax.set_title('📊 Average Rating per Meal', fontsize=16, fontweight='bold', 
-                    pad=20, color='#0f172a')
-        ax.set_ylim(0, 5.8)
+        # Modern styling
+        ax.set_ylabel('Average Rating', fontsize=14, fontweight='bold', 
+                     color=self.text_primary, labelpad=10)
+        ax.set_xlabel('Meal Type', fontsize=14, fontweight='bold', 
+                     color=self.text_primary, labelpad=10)
+        ax.set_title('📊 Average Rating per Meal', fontsize=18, fontweight='bold', 
+                    pad=25, color=self.text_primary)
+        ax.set_ylim(0, 6.0)
         ax.set_xticks(x_pos)
-        ax.set_xticklabels(meals, fontsize=11, fontweight='600')
+        ax.set_xticklabels(meals, fontsize=12, fontweight='600', color=self.text_secondary)
         
-        # Add reference lines
-        ax.axhline(y=5, color='#10B981', linestyle='--', linewidth=1.5, alpha=0.3, label='Excellent (5.0)')
-        ax.axhline(y=4, color='#84CC16', linestyle='--', linewidth=1.5, alpha=0.3, label='Good (4.0)')
-        ax.axhline(y=3, color='#F59E0B', linestyle='--', linewidth=1.5, alpha=0.3, label='Average (3.0)')
-        ax.axhline(y=2, color='#EF4444', linestyle='--', linewidth=1.5, alpha=0.3, label='Poor (2.0)')
+        # Reference lines with modern styling
+        reference_lines = [
+            (5, '#10b981', 'Excellent (5.0)'),
+            (4, '#84cc16', 'Good (4.0)'),
+            (3, '#fbbf24', 'Average (3.0)'),
+            (2, '#f97316', 'Poor (2.0)')
+        ]
+        
+        for y_val, color, label in reference_lines:
+            ax.axhline(y=y_val, color=color, linestyle='--', 
+                      linewidth=2, alpha=0.4, label=label)
         
         # Grid styling
-        ax.grid(axis='y', alpha=0.2, linestyle='-', linewidth=0.8)
+        ax.grid(axis='y', alpha=0.15, linestyle='-', linewidth=1.2, color='#475569')
         ax.set_axisbelow(True)
         
-        # Legend
-        ax.legend(loc='upper right', framealpha=0.9, fontsize=9)
+        # Legend with dark theme
+        legend = ax.legend(loc='upper right', framealpha=0.95, fontsize=10,
+                          facecolor=self.bg_dark, edgecolor=self.border_color,
+                          labelcolor=self.text_secondary)
+        legend.get_frame().set_linewidth(1.5)
         
-        # Add border
+        # Spine styling
         for spine in ax.spines.values():
-            spine.set_edgecolor('#cbd5e1')
-            spine.set_linewidth(1.5)
+            spine.set_edgecolor(self.border_color)
+            spine.set_linewidth(2)
+        
+        # Tick styling
+        ax.tick_params(colors=self.text_secondary, which='both', 
+                      length=6, width=1.5)
         
         plt.tight_layout()
         
@@ -155,15 +200,15 @@ class ChartGenerator:
         return self.save_and_encode(fig, filepath)
     
     def generate_rating_distribution_chart(self, data, date_str):
-        """Generate 4 separate bar charts for rating distribution - one per meal"""
+        """Generate 4 modern bar charts for rating distribution - one per meal"""
         distribution_data = data.get('feedbackDistributionPerMeal', {})
         
         if not distribution_data:
             return {'path': None, 'base64': None}
         
         # Create 2x2 subplot layout
-        fig, axes = plt.subplots(2, 2, figsize=(16, 12))
-        fig.patch.set_facecolor('white')
+        fig, axes = plt.subplots(2, 2, figsize=(18, 14))
+        fig.patch.set_facecolor(self.bg_darker)
         axes = axes.flatten()
         
         meal_names = list(distribution_data.keys())
@@ -171,57 +216,73 @@ class ChartGenerator:
         star_keys = ['1_star', '2_star', '3_star', '4_star', '5_star']
         
         for idx, (meal, ax) in enumerate(zip(meal_names, axes)):
-            ax.set_facecolor('#f8fafc')
+            ax.set_facecolor(self.bg_dark)
             meal_dist = distribution_data[meal]
             
             # Get counts for each star rating
             counts = [meal_dist.get(key, 0) for key in star_keys]
             colors_list = [self.rating_colors[i+1] for i in range(5)]
             
-            # Create bar chart
+            # Create bar chart with gradient effect
             x_pos = np.arange(5)
-            bars = ax.bar(x_pos, counts, color=colors_list, alpha=0.85,
-                         edgecolor='white', linewidth=2, width=0.6)
+            bars = ax.bar(x_pos, counts, color=colors_list, alpha=0.9,
+                         edgecolor='#334155', linewidth=2.5, width=0.7)
+            
+            # Add glow effect
+            for bar, color in zip(bars, colors_list):
+                x = bar.get_x()
+                width = bar.get_width()
+                height = bar.get_height()
+                ax.bar(x, height, width=width, color=color, alpha=0.2, 
+                      edgecolor='none', linewidth=0)
             
             # Add count labels on bars
             for bar, count in zip(bars, counts):
                 if count > 0:
                     height = bar.get_height()
-                    ax.text(bar.get_x() + bar.get_width()/2., height + 0.3,
+                    ax.text(bar.get_x() + bar.get_width()/2., height + 0.5,
                            f'{int(count)}', ha='center', va='bottom',
-                           fontsize=12, fontweight='bold', color='#1e293b')
+                           fontsize=13, fontweight='bold', color=self.text_primary)
             
             # Styling
-            meal_color = self.meal_colors.get(meal, '#60A5FA')
-            ax.set_title(f'{meal}', fontsize=14, fontweight='bold', 
-                        pad=15, color=meal_color,
-                        bbox=dict(boxstyle='round,pad=0.8', facecolor='white',
-                                edgecolor=meal_color, linewidth=2))
-            ax.set_xlabel('Rating', fontsize=11, fontweight='bold', color='#1e293b')
-            ax.set_ylabel('Number of Ratings', fontsize=11, fontweight='bold', color='#1e293b')
+            meal_color = self.meal_colors.get(meal, '#60a5fa')
+            title_bbox = dict(boxstyle='round,pad=0.8', facecolor=meal_color,
+                            edgecolor='#0f172a', linewidth=2.5, alpha=0.95)
+            ax.set_title(f'{meal}', fontsize=15, fontweight='bold', 
+                        pad=18, color='white', bbox=title_bbox)
+            ax.set_xlabel('Rating', fontsize=12, fontweight='bold', 
+                         color=self.text_primary, labelpad=10)
+            ax.set_ylabel('Number of Ratings', fontsize=12, fontweight='bold', 
+                         color=self.text_primary, labelpad=10)
             ax.set_xticks(x_pos)
-            ax.set_xticklabels(star_labels, fontsize=11, fontweight='600')
+            ax.set_xticklabels(star_labels, fontsize=12, fontweight='600',
+                              color=self.text_secondary)
             
             # Grid and styling
-            ax.grid(axis='y', alpha=0.2, linestyle='-', linewidth=0.8)
+            ax.grid(axis='y', alpha=0.15, linestyle='-', linewidth=1.2, color='#475569')
             ax.set_axisbelow(True)
             
             # Add total count annotation
             total = sum(counts)
+            total_bbox = dict(boxstyle='round,pad=0.6', facecolor=self.bg_dark,
+                            edgecolor=meal_color, linewidth=2, alpha=0.95)
             ax.text(0.98, 0.98, f'Total: {int(total)}', 
                    transform=ax.transAxes, ha='right', va='top',
-                   fontsize=10, fontweight='bold',
-                   bbox=dict(boxstyle='round,pad=0.5', facecolor='#f1f5f9',
-                            edgecolor='#cbd5e1', linewidth=1))
+                   fontsize=11, fontweight='bold', color=self.text_primary,
+                   bbox=total_bbox)
             
             # Border styling
             for spine in ax.spines.values():
-                spine.set_edgecolor('#cbd5e1')
-                spine.set_linewidth(1.5)
+                spine.set_edgecolor(self.border_color)
+                spine.set_linewidth(2)
+            
+            # Tick styling
+            ax.tick_params(colors=self.text_secondary, which='both', 
+                          length=6, width=1.5)
         
         # Overall title
-        fig.suptitle('📈 Rating Distribution Analysis', fontsize=18, fontweight='bold',
-                    y=0.995, color='#0f172a')
+        fig.suptitle('📈 Rating Distribution Analysis', fontsize=20, fontweight='bold',
+                    y=0.995, color=self.text_primary)
         
         plt.tight_layout()
         
@@ -229,9 +290,9 @@ class ChartGenerator:
         return self.save_and_encode(fig, filepath)
     
     def generate_sentiment_chart(self, data, date_str):
-        """Generate comprehensive sentiment analysis with NLP-based pie chart"""
+        """Generate modern sentiment analysis with NLP-based donut chart"""
         sentiment_data = data.get('sentimentAnalysisPerMeal', {})
-        all_comments = data.get('allComments', [])  # We'll need to add this
+        all_comments = data.get('allComments', [])
         
         if not sentiment_data:
             return {'path': None, 'base64': None, 'topComments': {}}
@@ -274,17 +335,16 @@ class ChartGenerator:
             else:
                 positive_pct = negative_pct = neutral_pct = 0
         else:
-            # Fallback to rating-based sentiment
             positive_pct = negative_pct = neutral_pct = 0
             positive_comments = negative_comments = []
         
-        # Create single beautiful pie chart for overall sentiment
-        fig = plt.figure(figsize=(14, 8))
-        fig.patch.set_facecolor('white')
+        # Create modern dark-themed chart
+        fig = plt.figure(figsize=(16, 9))
+        fig.patch.set_facecolor(self.bg_darker)
         
-        # Main pie chart
+        # Main donut chart
         ax_pie = plt.subplot2grid((2, 3), (0, 0), colspan=2, rowspan=2)
-        ax_pie.set_facecolor('white')
+        ax_pie.set_facecolor(self.bg_darker)
         
         sentiments = []
         percentages = []
@@ -304,53 +364,61 @@ class ChartGenerator:
             colors.append(self.sentiment_colors['negative'])
         
         if percentages:
-            # Create beautiful donut chart
-            wedges, texts, autotexts = ax_pie.pie(percentages, labels=sentiments, colors=colors,
-                                                   autopct='%1.1f%%', startangle=90,
-                                                   textprops={'fontsize': 12, 'fontweight': 'bold'},
-                                                   pctdistance=0.85, explode=[0.05] * len(percentages))
+            # Create modern donut chart with shadow effect
+            wedges, texts, autotexts = ax_pie.pie(
+                percentages, labels=sentiments, colors=colors,
+                autopct='%1.1f%%', startangle=90,
+                textprops={'fontsize': 13, 'fontweight': 'bold', 'color': self.text_primary},
+                pctdistance=0.82, explode=[0.05] * len(percentages),
+                wedgeprops={'linewidth': 3, 'edgecolor': '#0f172a', 'alpha': 0.95}
+            )
             
             # Make percentage text white and bold
             for autotext in autotexts:
                 autotext.set_color('white')
-                autotext.set_fontsize(13)
+                autotext.set_fontsize(14)
                 autotext.set_fontweight('bold')
             
             # Draw center circle for donut effect
-            centre_circle = plt.Circle((0, 0), 0.65, fc='white', linewidth=2, edgecolor='#cbd5e1')
+            centre_circle = plt.Circle((0, 0), 0.65, fc=self.bg_dark, 
+                                      linewidth=4, edgecolor=self.border_color)
             ax_pie.add_artist(centre_circle)
             
-            # Add center text
-            ax_pie.text(0, 0.1, 'Overall', ha='center', va='center',
-                       fontsize=14, fontweight='bold', color='#64748b')
+            # Add center text with modern styling
+            ax_pie.text(0, 0.15, 'Overall', ha='center', va='center',
+                       fontsize=16, fontweight='bold', color=self.text_secondary)
             ax_pie.text(0, -0.15, 'Sentiment', ha='center', va='center',
-                       fontsize=14, fontweight='bold', color='#64748b')
+                       fontsize=16, fontweight='bold', color=self.text_secondary)
         
-        ax_pie.set_title('🎭 Sentiment Analysis (NLP-Based)', fontsize=16, fontweight='bold',
-                        pad=20, color='#0f172a')
+        ax_pie.set_title('🎭 Sentiment Analysis (NLP-Based)', fontsize=18, fontweight='bold',
+                        pad=25, color=self.text_primary)
         
-        # Top comments section
+        # Top comments section with modern dark theme
         ax_comments = plt.subplot2grid((2, 3), (0, 2), rowspan=2)
         ax_comments.axis('off')
+        ax_comments.set_facecolor(self.bg_darker)
         
-        comment_text = "📝 TOP COMMENTS\n\n"
+        comment_text = "📝 TOP COMMENTS\n" + "─" * 35 + "\n\n"
         
         if positive_comments:
             comment_text += "✅ POSITIVE:\n"
             for i, c in enumerate(positive_comments[:3], 1):
-                truncated = (c['text'][:60] + '...') if len(c['text']) > 60 else c['text']
-                comment_text += f"{i}. {truncated}\n   ({c['meal']}, {c['rating']}★)\n\n"
+                truncated = (c['text'][:55] + '...') if len(c['text']) > 55 else c['text']
+                comment_text += f"{i}. {truncated}\n"
+                comment_text += f"   ({c['meal']}, {c['rating']}★)\n\n"
         
         if negative_comments:
             comment_text += "\n❌ NEGATIVE:\n"
             for i, c in enumerate(negative_comments[:3], 1):
-                truncated = (c['text'][:60] + '...') if len(c['text']) > 60 else c['text']
-                comment_text += f"{i}. {truncated}\n   ({c['meal']}, {c['rating']}★)\n\n"
+                truncated = (c['text'][:55] + '...') if len(c['text']) > 55 else c['text']
+                comment_text += f"{i}. {truncated}\n"
+                comment_text += f"   ({c['meal']}, {c['rating']}★)\n\n"
         
+        comment_bbox = dict(boxstyle='round,pad=1.2', facecolor=self.bg_dark,
+                          edgecolor=self.border_color, linewidth=2.5, alpha=0.95)
         ax_comments.text(0.05, 0.95, comment_text, transform=ax_comments.transAxes,
-                        fontsize=9, verticalalignment='top', fontfamily='monospace',
-                        bbox=dict(boxstyle='round,pad=1', facecolor='#f1f5f9',
-                                edgecolor='#cbd5e1', linewidth=1.5))
+                        fontsize=9.5, verticalalignment='top', fontfamily='monospace',
+                        color=self.text_secondary, bbox=comment_bbox, linespacing=1.6)
         
         plt.tight_layout()
         
@@ -368,7 +436,7 @@ class ChartGenerator:
         return result
     
     def generate_participation_chart(self, data, date_str):
-        """Generate beautiful participation rate visualization"""
+        """Generate modern participation rate visualization with dark theme"""
         overview = data.get('overview', {})
         total_students = overview.get('totalStudents', 0)
         participating = overview.get('participatingStudents', 0)
@@ -376,72 +444,78 @@ class ChartGenerator:
         if total_students == 0:
             return {'path': None, 'base64': None}
         
-        fig = plt.figure(figsize=(12, 8))
-        fig.patch.set_facecolor('white')
+        fig = plt.figure(figsize=(14, 9))
+        fig.patch.set_facecolor(self.bg_darker)
         
         # Create main donut chart
         ax_main = plt.subplot2grid((2, 2), (0, 0), colspan=2, rowspan=2)
-        ax_main.set_facecolor('white')
+        ax_main.set_facecolor(self.bg_darker)
         
         non_participating = total_students - participating
         sizes = [participating, non_participating]
         labels = [f'Participated\n({participating} students)', 
                  f'Did Not Participate\n({non_participating} students)']
-        colors = ['#10B981', '#EF4444']
-        explode = (0.05, 0.05)
+        colors = ['#10b981', '#ef4444']
+        explode = (0.08, 0.08)
         
-        wedges, texts, autotexts = ax_main.pie(sizes, labels=labels, colors=colors,
-                                               autopct='%1.1f%%', startangle=90,
-                                               textprops={'fontsize': 11, 'fontweight': 'bold'},
-                                               pctdistance=0.85, explode=explode,
-                                               shadow=True)
+        wedges, texts, autotexts = ax_main.pie(
+            sizes, labels=labels, colors=colors,
+            autopct='%1.1f%%', startangle=90,
+            textprops={'fontsize': 12, 'fontweight': 'bold', 'color': self.text_primary},
+            pctdistance=0.82, explode=explode,
+            wedgeprops={'linewidth': 4, 'edgecolor': '#0f172a', 'alpha': 0.95},
+            shadow=True
+        )
         
         # Style the text
         for text in texts:
-            text.set_fontsize(12)
+            text.set_fontsize(13)
             text.set_fontweight('bold')
+            text.set_color(self.text_primary)
         
         for autotext in autotexts:
             autotext.set_color('white')
-            autotext.set_fontsize(14)
+            autotext.set_fontsize(15)
             autotext.set_fontweight('bold')
         
-        # Draw center circle for donut effect with gradient appearance
-        centre_circle = plt.Circle((0, 0), 0.68, fc='white', linewidth=3, edgecolor='#cbd5e1')
+        # Draw center circle for donut effect
+        centre_circle = plt.Circle((0, 0), 0.65, fc=self.bg_dark, 
+                                  linewidth=5, edgecolor=self.border_color)
         ax_main.add_artist(centre_circle)
         
         # Add center text with participation rate
         participation_rate = overview.get('participationRate', 0)
-        rate_color = '#10B981' if participation_rate >= 70 else '#F59E0B' if participation_rate >= 50 else '#EF4444'
+        rate_color = '#10b981' if participation_rate >= 70 else '#fbbf24' if participation_rate >= 50 else '#ef4444'
         
-        ax_main.text(0, 0.15, f'{participation_rate:.1f}%', ha='center', va='center',
-                    fontsize=36, fontweight='bold', color=rate_color)
+        ax_main.text(0, 0.2, f'{participation_rate:.1f}%', ha='center', va='center',
+                    fontsize=42, fontweight='bold', color=rate_color)
         ax_main.text(0, -0.15, 'Participation', ha='center', va='center',
-                    fontsize=14, fontweight='bold', color='#64748b')
+                    fontsize=16, fontweight='bold', color=self.text_secondary)
         
         # Add emoji based on participation rate
         emoji = '🎉' if participation_rate >= 70 else '👍' if participation_rate >= 50 else '📢'
-        ax_main.text(0, -0.35, emoji, ha='center', va='center', fontsize=32)
+        ax_main.text(0, -0.40, emoji, ha='center', va='center', fontsize=36)
         
-        ax_main.set_title('👥 Student Participation Rate', fontsize=16, fontweight='bold',
-                         pad=20, color='#0f172a')
+        ax_main.set_title('👥 Student Participation Rate', fontsize=18, fontweight='bold',
+                         pad=25, color=self.text_primary)
         
-        # Add stats box
-        stats_text = f"""
-        📊 PARTICIPATION STATS
+        # Add stats box with modern styling
+        stats_text = f"""📊 PARTICIPATION STATS
+{"─" * 28}
+
+Total Students: {total_students}
+Participated: {participating}
+Not Participated: {non_participating}
+
+Overall Rating: {overview.get('overallRating', 0):.1f}★/5.0
+Quality Score: {overview.get('qualityConsistencyScore', 0):.0f}/100
+"""
         
-        Total Students: {total_students}
-        Participated: {participating}
-        Not Participated: {non_participating}
-        
-        Overall Rating: {overview.get('overallRating', 0):.1f}★/5.0
-        Quality Consistency: {overview.get('qualityConsistencyScore', 0):.0f}/100
-        """
-        
-        ax_main.text(1.15, 0.5, stats_text, transform=ax_main.transAxes,
-                    fontsize=10, verticalalignment='center', fontfamily='monospace',
-                    bbox=dict(boxstyle='round,pad=1', facecolor='#f1f5f9',
-                            edgecolor='#cbd5e1', linewidth=2))
+        stats_bbox = dict(boxstyle='round,pad=1.2', facecolor=self.bg_dark,
+                        edgecolor=self.border_color, linewidth=2.5, alpha=0.95)
+        ax_main.text(1.22, 0.5, stats_text, transform=ax_main.transAxes,
+                    fontsize=11, verticalalignment='center', fontfamily='monospace',
+                    color=self.text_secondary, bbox=stats_bbox, linespacing=1.8)
         
         plt.tight_layout()
         
