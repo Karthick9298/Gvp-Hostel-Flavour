@@ -22,7 +22,7 @@ class AnalyticsService {
           params: {
             include_charts: true
           },
-          timeout: 60000 // 60 second timeout
+          timeout: 100000 // 60 second timeout
         }
       );
       
