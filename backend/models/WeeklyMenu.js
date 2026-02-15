@@ -115,7 +115,7 @@ weeklyMenuSchema.statics.getTodaysMenu = async function() {
   const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
   const dayName = dayNames[istTime.getDay()];
   
-  console.log(`Debug: Today is ${dayName}, IST time: ${istTime.toLocaleString()}`);
+  // console.log(`Debug: Today is ${dayName}, IST time: ${istTime.toLocaleString()}`);
   
   return {
     dayName,

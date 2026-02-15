@@ -110,7 +110,7 @@ feedbackSchema.methods.canSubmitMeal = function(mealType) {
   const istTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
   const currentHour = istTime.getHours();
   
-  console.log(`Debug: Current IST time: ${istTime.toLocaleString()}, Hour: ${currentHour}, Meal: ${mealType}`);
+  // console.log(`Debug: Current IST time: ${istTime.toLocaleString()}, Hour: ${currentHour}, Meal: ${mealType}`);
 
   // Check if meal is already submitted
   if (this.meals[mealType].rating !== null) {

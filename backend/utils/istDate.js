@@ -16,8 +16,8 @@ const now = new Date();
 const todayIST = getISTDate(now);
 const yesterdayIST = getISTDate(new Date(now.getTime() - 24 * 60 * 60 * 1000));
 
-console.log('Current UTC:', now.toISOString());
-console.log('Today IST (date only):', todayIST.toISOString());
-console.log('Yesterday IST (date only):', yesterdayIST.toISOString());
+// console.log('Current UTC:', now.toISOString());
+// console.log('Today IST (date only):', todayIST.toISOString());
+// console.log('Yesterday IST (date only):', yesterdayIST.toISOString());
 
 export { getISTDate };

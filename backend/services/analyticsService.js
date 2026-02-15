@@ -14,7 +14,7 @@ class AnalyticsService {
    */
   async getDailyAnalysis(dateString) {
     try {
-      console.log(`Fetching daily analysis from FastAPI for: ${dateString}`);
+      // console.log(`Fetching daily analysis from FastAPI for: ${dateString}`);
       
       const response = await axios.get(
         `${this.analyticsApiUrl}/api/analytics/daily/${dateString}`,
@@ -28,9 +28,9 @@ class AnalyticsService {
       
       const result = response.data;
       
-      console.log('=== FASTAPI RESPONSE ===');
-      console.log('Status:', result.status);
-      console.log('Has charts:', 'charts' in result);
+      // console.log('=== FASTAPI RESPONSE ===');
+      // console.log('Status:', result.status);
+      // console.log('Has charts:', 'charts' in result);
       
       // Handle different response types
       if (result.status === 'success') {

@@ -43,7 +43,7 @@ router.post('/submit', [
     const currentDate = new Date(istTime.getFullYear(), istTime.getMonth(), istTime.getDate());
     currentDate.setHours(0, 0, 0, 0); // Ensure time is 00:00:00.000
 
-    console.log(`Debug Feedback Submit: User ${userId}, Current Date: ${currentDate.toISOString()}, IST Time: ${istTime.toLocaleString()}`);
+    // console.log(`Debug Feedback Submit: User ${userId}, Current Date: ${currentDate.toISOString()}, IST Time: ${istTime.toLocaleString()}`);
 
     // Find or create feedback document for today
     let feedback = await Feedback.findOne({
@@ -52,7 +52,7 @@ router.post('/submit', [
     });
 
     if (!feedback) {
-      console.log(`Creating new feedback document for user ${userId} on date ${currentDate.toISOString()}`);
+      // console.log(`Creating new feedback document for user ${userId} on date ${currentDate.toISOString()}`);
       feedback = new Feedback({
         user: userId,
         date: currentDate,
@@ -64,8 +64,8 @@ router.post('/submit', [
         }
       });
     } else {
-      console.log(`Found existing feedback document for user ${userId} on date ${currentDate.toISOString()}`);
-      console.log(`Current meal ${mealType} status:`, feedback.meals[mealType]);
+      // console.log(`Found existing feedback document for user ${userId} on date ${currentDate.toISOString()}`);
+      // console.log(`Current meal ${mealType} status:`, feedback.meals[mealType]);
     }
 
     // Check if meal can be submitted
@@ -133,7 +133,7 @@ router.get('/my-feedback', authenticateFirebaseToken, async (req, res) => {
     });
 
     if (!feedback) {
-      console.log(`No feedback found for user ${userId} on date ${currentDate.toISOString()}, creating empty structure`);
+      // console.log(`No feedback found for user ${userId} on date ${currentDate.toISOString()}, creating empty structure`);
       // Create empty feedback structure
       feedback = {
         _id: null,
@@ -149,8 +149,8 @@ router.get('/my-feedback', authenticateFirebaseToken, async (req, res) => {
         updatedAt: currentDate
       };
     } else {
-      console.log(`Found existing feedback for user ${userId} on date ${currentDate.toISOString()}`);
-      console.log('Feedback meals:', JSON.stringify(feedback.meals, null, 2));
+      // console.log(`Found existing feedback for user ${userId} on date ${currentDate.toISOString()}`);
+      // console.log('Feedback meals:', JSON.stringify(feedback.meals, null, 2));
     }
 
     // Get submission statistics (manually calculate for empty feedback)
