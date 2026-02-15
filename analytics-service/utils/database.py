@@ -23,8 +23,10 @@ class DatabaseConnection:
         
     def connect(self):
         """Connect to MongoDB"""
+        import traceback
         try:
-            self.client = MongoClient(self.mongo_uri)
+            print(f"DEBUG: MongoDB URI (masked): {self.mongo_uri[:20]}...", file=sys.stderr)
+            self.client = MongoClient(self.mongo_uri, serverSelectionTimeoutMS=5000)
             
             # Extract database name from URI
             if '/' in self.mongo_uri:
@@ -33,18 +35,26 @@ class DatabaseConnection:
                     db_part = uri_parts[-1].split('?')[0]
                     if db_part:
                         self.db = self.client[db_part]
+                        print(f"DEBUG: Using database from URI: {db_part}", file=sys.stderr)
                     else:
                         self.db = self.client['hostel-food-analysis']
+                        print(f"DEBUG: Using default database: hostel-food-analysis", file=sys.stderr)
                 else:
                     self.db = self.client['hostel-food-analysis']
+                    print(f"DEBUG: Using default database: hostel-food-analysis", file=sys.stderr)
             else:
                 self.db = self.client['hostel-food-analysis']
+                print(f"DEBUG: Using default database: hostel-food-analysis", file=sys.stderr)
             
             # Test connection
+            print(f"DEBUG: Testing database connection with ping", file=sys.stderr)
             self.db.command('ping')
+            print(f"DEBUG: Database connection successful", file=sys.stderr)
             return True
         except Exception as e:
-            print(f"Database connection failed: {str(e)}", file=sys.stderr)
+            error_trace = traceback.format_exc()
+            print(f"ERROR: Database connection failed: {str(e)}", file=sys.stderr)
+            print(f"TRACEBACK:\n{error_trace}", file=sys.stderr)
             return False
             
     def close(self):

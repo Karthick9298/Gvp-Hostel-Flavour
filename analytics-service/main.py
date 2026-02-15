@@ -26,10 +26,13 @@ app = FastAPI(
     version="2.0.0"
 )
 
+# Get allowed origins from environment
+allowed_origins = os.getenv("CORS_ORIGINS", "*").split(",")
+
 # CORS Configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:5000").split(","),
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -81,10 +84,15 @@ async def get_daily_analysis(
     Returns:
         Comprehensive analytics data with charts
     """
+    import traceback
+    import sys
+    
     # Validate date format
     try:
         requested_date = datetime.strptime(date, '%Y-%m-%d')
-    except ValueError:
+    except ValueError as e:
+        error_msg = f"Invalid date format: {str(e)}"
+        print(f"ERROR: {error_msg}", file=sys.stderr)
         raise HTTPException(
             status_code=400,
             detail="Invalid date format. Use YYYY-MM-DD"
@@ -112,18 +120,29 @@ async def get_daily_analysis(
         )
     
     try:
+        print(f"INFO: Starting analysis for date: {date}, include_charts: {include_charts}", file=sys.stderr)
+        
         # Perform analysis
         result = analyze_daily_feedback(date, include_charts=include_charts)
         
+        print(f"INFO: Analysis completed with status: {result.get('status', 'unknown')}", file=sys.stderr)
+        
         if result.get("error"):
+            error_msg = result.get("message", "Analysis failed")
+            print(f"ERROR: Analysis returned error: {error_msg}", file=sys.stderr)
             raise HTTPException(
                 status_code=500,
-                detail=result.get("message", "Analysis failed")
+                detail=error_msg
             )
         
         return JSONResponse(content=result)
         
+    except HTTPException:
+        raise
     except Exception as e:
+        error_trace = traceback.format_exc()
+        print(f"ERROR: Daily analysis exception: {str(e)}", file=sys.stderr)
+        print(f"TRACEBACK:\n{error_trace}", file=sys.stderr)
         raise HTTPException(
             status_code=500,
             detail=f"Daily analysis failed: {str(e)}"

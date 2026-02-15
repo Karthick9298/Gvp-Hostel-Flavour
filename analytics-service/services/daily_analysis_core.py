@@ -137,12 +137,18 @@ def analyze_daily_feedback(date_str: str, include_charts: bool = True) -> dict:
     Returns:
         Dictionary with analysis results
     """
+    import traceback
+    
+    print(f"DEBUG: Creating database connection", file=sys.stderr)
     db_conn = DatabaseConnection()
     
+    print(f"DEBUG: Attempting to connect to database", file=sys.stderr)
     if not db_conn.connect():
+        error_msg = "Failed to connect to database"
+        print(f"ERROR: {error_msg}", file=sys.stderr)
         return {
             "error": True,
-            "message": "Failed to connect to database",
+            "message": error_msg,
             "status": "error"
         }
     
