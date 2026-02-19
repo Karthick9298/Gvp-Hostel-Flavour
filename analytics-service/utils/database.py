@@ -10,10 +10,13 @@ from datetime import datetime, timedelta
 from pymongo import MongoClient
 from dotenv import load_dotenv
 
-# Load environment variables from backend .env
-env_path = os.path.join(os.path.dirname(__file__), '..', '..', 'backend', '.env')
+# Load environment variables from analytics-service .env
+env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
 if os.path.exists(env_path):
     load_dotenv(env_path)
+else:
+    # If .env doesn't exist, load from environment (for Render deployment)
+    load_dotenv()
 
 class DatabaseConnection:
     def __init__(self):
