@@ -32,8 +32,12 @@ connectDB();
 app.use(helmet());
 
 // CORS configuration
+let origin = process.env.CORS_ORIGIN || 'http://localhost:5173';
+if (process.env.NODE_ENV === 'development') {
+  origin = 'http://localhost:5173';
+}
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: origin,
   credentials: true
 }));
 
