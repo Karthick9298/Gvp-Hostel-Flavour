@@ -1,342 +1,484 @@
-# 🍽️ Hostel Flavour — Hostel Food Feedback & Analytics Platform
+# 🍽️ GVP Hostel Flavour
+
+<div align="center">
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
-[![React](https://img.shields.io/badge/React-19+-blue.svg)](https://reactjs.org/)
+[![React](https://img.shields.io/badge/React-19-blue.svg)](https://reactjs.org/)
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-6+-green.svg)](https://www.mongodb.com/)
+[![Firebase](https://img.shields.io/badge/Firebase-Auth-orange.svg)](https://firebase.google.com/)
 
-## 📋 Overview
+**A full-stack hostel food feedback and analytics platform for GVP College of Engineering.**
 
-**Hostel Flavour** is a comprehensive full-stack application designed for hostel food management, enabling students to provide meal feedback and administrators to analyze dining quality through advanced analytics and visualizations.
+</div>
 
-### 🏗️ Architecture
+---
 
-The project follows a **microservices architecture**:
+## 📌 Overview
 
-- **`frontend/`** — React 19 + Vite + Tailwind CSS (Student & Admin UI)
-- **`backend/`** — Express.js + MongoDB + Firebase Auth (REST API)
-- **`analytics-service/`** — FastAPI + Python (Independent Analytics Microservice)
+**GVP Hostel Flavour** is a role-based web application that lets hostel students rate and comment on their daily meals (Breakfast, Lunch, Snacks, and Dinner) — and lets administrators dive deep into food quality analytics powered by a dedicated Python microservice.
 
-### Architecture Diagram
-```
-┌─────────────┐      ┌─────────────┐      ┌──────────────────┐
-│   Frontend  │─────▶│   Backend   │─────▶│    Analytics     │
-│   (React)   │      │  (Express)  │      │    (FastAPI)     │
-└─────────────┘      └──────┬──────┘      └────────┬─────────┘
-                            │                      │
-                            ▼                      ▼
-                     ┌─────────────────────────────┐
-                     │      MongoDB Database       │
-                     └─────────────────────────────┘
-```
+The platform follows a **microservices architecture** split across three independent services:
 
-## ✨ Features
+- **Frontend** — React 19 SPA for students and admins
+- **Backend** — Express.js REST API handling auth, feedback, menu management, and analytics routing
+- **Analytics Service** — Python FastAPI microservice that runs statistical analysis and generates matplotlib/seaborn visualizations
+
+---
+
+
+
+
+[![Live Demo](https://img.shields.io/badge/LIVE%20DEMO-VISIT%20SITE-0A66C2?style=for-the-badge)](https://gvp-hostel-flavour.vercel.app/)
+
+🔗 **https://gvp-hostel-flavour.vercel.app/**
+
+
+---
+
+## 📸 Screenshots
+
+| Login Page | Student Dashboard |
+|---|---|
+| [<img src="./screenshots/Screenshot%20from%202026-04-16%2021-44-37.png" alt="Landing Page" width="100%" />](./screenshots/Screenshot%20from%202026-04-16%2021-44-37.png) | [<img src="./screenshots/Screenshot%20from%202026-04-16%2021-46-31.png" alt="Dashboard" width="100%" />](./screenshots/Screenshot%20from%202026-04-16%2021-46-31.png) |
+
+| Student Profile View | Admin Dashboard  |
+|---|---|
+| [<img src="./screenshots/Screenshot%20from%202026-04-16%2021-46-42.png" alt="Login OTP" width="100%" />](./screenshots/Screenshot%20from%202026-04-16%2021-46-42.png) | [<img src="./screenshots/Screenshot%20from%202026-04-16%2021-49-44.png" alt="Register" width="100%" />](./screenshots/Screenshot%20from%202026-04-16%2021-49-44.png) |
+
+<p align="center">
+  <b>Analytics View(Admin)</b><br />
+  <a href="./screenshots/Screenshot%20from%202026-04-16%2021-49-53.png">
+    <img src="./screenshots/Screenshot%20from%202026-04-16%2021-49-53.png" alt="Analytics View" width="70%" />
+  </a>
+</p>
+
+---
+
+## 🚀 Features
 
 ### 👨‍🎓 Student Features
-- 🔐 **Secure Authentication** — Firebase-based login/registration
-- ⭐ **Meal Feedback System** — Rate and comment on 4 daily meals:
-  - Morning (Breakfast)
-  - Afternoon (Lunch)
-  - Evening (Snacks)
-  - Night (Dinner)
-- 📊 **Submission Dashboard** — Real-time feedback status tracking
-- 📅 **Menu Display** — View daily and weekly meal schedules
-- ⏰ **Time-based Submissions** — Smart time windows for each meal
+- 🔐 **Secure Authentication** — Email/password and Google Sign-In via Firebase
+- ⭐ **Meal Feedback** — Rate and comment on 4 daily meals with time-gated submission windows
+- 📅 **Today's Menu** — View the active weekly meal schedule per day
+- 📊 **Submission Tracker** — Real-time feedback status showing completed vs pending meals
+- 👤 **Profile Management** — Update personal details (name, room, roll number)
 
 ### 👨‍💼 Admin Features
-- 📈 **Daily Analytics Dashboard** — Comprehensive insights for any date:
-  - Overall participation rates
+- 📈 **Daily Analytics Dashboard** — Date-selectable insights including:
+  - Participation rates and student counts
   - Average ratings per meal
-  - Rating distribution analysis
-  - Sentiment analysis (positive/neutral/negative)
-  - Quality consistency scoring
-- 📊 **Interactive Charts** — Chart.js visualizations with real-time data
-- 🎨 **Static Charts** — Python-generated matplotlib/seaborn charts (base64)
-status
-- 📋 **Menu Management** — Create, update, delete weekly menus
+  - Rating distribution across all meals
+  - Sentiment analysis (positive / neutral / negative)
+  - Quality Consistency Score (0–100)
+- 📊 **Visual Charts** — Python-generated matplotlib/seaborn charts embedded as base64 images
+- 🗓️ **Menu Management** — Full CRUD for weekly menus
+- 👥 **User Management** — Toggle admin roles and activate/deactivate student accounts
 
-### 📊 Analytics & Visualizations
-- **Average Ratings Chart** — Color-coded bar charts
-- **Rating Distribution** — Stacked bar charts per meal
-- **Sentiment Analysis** — Pie charts showing feedback sentiment
-- **Participation Rate** — Donut charts with engagement metrics
+### 📊 Analytics Engine (Python Microservice)
+- Per-meal average ratings with color-coded bar charts
+- Rating distribution stacked bar charts
+- Sentiment pie charts per meal
+- Participation rate donut charts
+- Quality consistency scoring using coefficient of variation
+- Auto-generated daily summary narrative
 
-## 🛠️ Tech Stack
+---
+
+## 🛠 Tech Stack
 
 ### Frontend
-- **Framework:** React 19+ with Vite
-- **Styling:** Tailwind CSS
-## 🚀 Quick Start
+| Technology | Purpose |
+|-----------|---------|
+| React 19 + Vite | UI framework & build tool |
+| Tailwind CSS | Utility-first styling |
+| React Router v6 | Client-side routing |
+| Axios | HTTP client with interceptors |
+| Firebase JS SDK | Google Sign-In (client-side) |
+| Radix UI | Accessible UI components |
+| React Hot Toast | Toast notifications |
+| jsPDF + html2canvas | PDF export |
+| React Icons + Lucide | Iconography |
 
-### 🐳 Docker Deployment (Recommended)
+### Backend
+| Technology | Purpose |
+|-----------|---------|
+| Node.js + Express.js | REST API server |
+| MongoDB + Mongoose | Database & ODM |
+| Firebase Admin SDK | Token verification & user creation |
+| Helmet + express-rate-limit | Security hardening |
+| express-validator | Input validation |
+| Morgan | HTTP request logging |
+| dotenv | Environment configuration |
 
-**Prerequisites:** Docker & Docker Compose installed
+### Analytics Service
+| Technology | Purpose |
+|-----------|---------|
+| Python 3.8+ + FastAPI | Analytics microservice |
+| Uvicorn | ASGI server |
+| PyMongo | MongoDB direct access |
+| Matplotlib + Seaborn | Chart generation |
+| TextBlob | Sentiment analysis |
+
+### Database & Infrastructure
+| Technology | Purpose |
+|-----------|---------|
+| MongoDB Atlas | Cloud database |
+| Firebase Authentication | Identity provider |
+Frontend| Vercel | Backend deployment |
+| Render / Railway | Analytics service deployment |
+
+---
+
+## 🏗️ Architecture Diagram
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                          CLIENT BROWSER                          │
+│                       React 19 + Vite SPA                        │
+│           Student Dashboard │ Admin Dashboard │ Auth Pages        │
+└───────────────────────────┬──────────────────────────────────────┘
+                            │ HTTPS / REST API
+                            ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                     EXPRESS.JS BACKEND                           │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────┐ ┌──────────┐  │
+│  │  /auth   │ │ /feedback│ │/analytics│ │/menu │ │  /users  │  │
+│  └──────────┘ └──────────┘ └────┬─────┘ └──────┘ └──────────┘  │
+│            Firebase Admin SDK    │        Middleware: Helmet,     │
+│          (Token Verification)    │        Rate-Limit, CORS        │
+└──────────────────────────────────┼───────────────────────────────┘
+                 │                 │
+                 ▼                 ▼
+┌────────────────────┐   ┌──────────────────────────────────────────┐
+│   MongoDB Atlas    │   │       PYTHON FASTAPI MICROSERVICE        │
+│                    │   │                                          │
+│  ● Users           │◀──│  /api/analytics/daily/{date}            │
+│  ● Feedback        │   │                                          │
+│  ● WeeklyMenu      │   │  ┌──────────┐ ┌────────┐ ┌───────────┐ │
+└────────────────────┘   │  │ PyMongo  │ │ Matplt │ │  TextBlob │ │
+                         │  │  (DB)    │ │ Seaborn│ │(Sentiment)│ │
+                         │  └──────────┘ └────────┘ └───────────┘ │
+                         └──────────────────────────────────────────┘
+                                          │
+                         ┌────────────────┘
+                         ▼
+                ┌──────────────────┐
+                │  Firebase Auth   │
+                │  (Google OAuth   │
+                │  + Email/Pass)   │
+                └──────────────────┘
+```
+
+---
+
+## 📂 Folder Structure
+
+```
+Gvp-Hostel-Flavour/
+│
+├── frontend/                        # React 19 SPA
+│   ├── src/
+│   │   ├── pages/
+│   │   │   ├── auth/
+│   │   │   │   ├── Login.jsx        # Email + Google login
+│   │   │   │   └── Register.jsx     # Student registration
+│   │   │   ├── student/
+│   │   │   │   └── Dashboard.jsx    # Meal feedback UI
+│   │   │   ├── admin/
+│   │   │   │   └── DashboardDaily.jsx  # Admin analytics view
+│   │   │   └── Profile.jsx
+│   │   ├── components/
+│   │   │   ├── common/
+│   │   │   │   ├── StarRating.jsx
+│   │   │   │   └── LoadingSpinner.jsx
+│   │   │   └── layout/
+│   │   │       ├── Layout.jsx
+│   │   │       └── Navbar.jsx
+│   │   ├── contexts/
+│   │   │   └── AuthContext.jsx      # Global auth state
+│   │   └── config/
+│   │       ├── api.js               # Axios instance + API methods
+│   │       └── firebase.js          # Firebase client config
+│   └── package.json
+│
+├── backend/                         # Express.js REST API
+│   ├── server.js                    # App entry point
+│   ├── config/
+│   │   ├── database.js              # MongoDB connection
+│   │   └── firebase-admin.js        # Firebase Admin SDK setup
+│   ├── middleware/
+│   │   └── firebaseAuth.js          # JWT verification middleware
+│   ├── models/
+│   │   ├── User.js                  # User schema
+│   │   ├── Feedback.js              # Feedback schema (per-day, per-meal)
+│   │   └── WeeklyMenu.js            # Weekly menu template schema
+│   ├── routes/
+│   │   ├── auth-firebase.js         # Auth endpoints
+│   │   ├── feedback.js              # Feedback CRUD
+│   │   ├── analytics.js             # Analytics proxy routes
+│   │   ├── menu.js                  # Menu management
+│   │   └── users.js                 # User admin endpoints
+│   ├── services/
+│   │   └── analyticsService.js      # Calls Python microservice
+│   ├── scripts/                     # Admin utility scripts
+│   │   ├── bulk-register-users.js
+│   │   ├── insert-weekly-menu.js
+│   │   └── generate-test-feedback.js
+│   └── .env.example
+│
+└── analytics-service/               # Python FastAPI microservice
+    ├── main.py                      # FastAPI app entry point
+    ├── services/
+    │   └── daily_analysis_core.py   # Core analysis logic
+    ├── utils/
+    │   ├── database.py              # PyMongo connection
+    │   └── chart_generator.py       # Matplotlib/Seaborn chart builder
+    ├── requirements.txt
+    ├── Procfile                     # Heroku/Render deployment
+    └── .env.example
+```
+
+---
+
+## ⚙️ Setup Instructions
+
+### Prerequisites
+
+- Node.js 18+
+- Python 3.8+
+- MongoDB Atlas account (or local MongoDB)
+- Firebase project with Authentication enabled
+
+---
+
+### 1. Clone the Repository
 
 ```bash
-# Clone repository
 git clone https://github.com/Karthick9298/Gvp-Hostel-Flavour.git
 cd Gvp-Hostel-Flavour
-
-# Configure environment
-cp backend/.env.example backend/.env
-cp analytics-service/.env.example analytics-service/.env
-# Edit .env files with your credentials
-
-# Start all services
-docker-compose up -d
-
-# Check status
-docker-compose ps
-
-# View logs
-docker-compose logs -f
 ```
 
-**Service URLs:**
-- Frontend: http://localhost:80
-- Backend: http://localhost:5000
-- Analytics: http://localhost:8000
-- Analytics API Docs: http://localhost:8000/docs
+---
 
-### 💻 Local Development
-
-See detailed setup instructions in [DEPLOYMENT.md](DEPLOYMENT.md)
-### Backend
-- **Runtime:** Node.js 18+
-- **Framework:** Express.js
-- **Database:** MongoDB with Mongoose ODM
-- **Authentication:** Firebase Admin SDK
-- **Security:** Helmet, CORS, express-rate-limit
-- **Validation:** express-validator
-- **Timezone:** moment-timezone (IST support)
-
-### Analytics Service (FastAPI)
-- **Framework:** FastAPI (Python 3.8+)
-- **Database Client:** pymongo
-- **Visualization:** matplotlib, seaborn
-- **NLP:** textblob (sentiment analysis)
-- **Server:** Uvicorn (ASGI)
-- **API Docs:** Swagger UI, ReDoc
-
-### Infrastructure
-- **Authentication:** Firebase Authentication
-- **Database:** MongoDB (local or Atlas)
-- **File Storage:** Local filesystem for chart outputs
-
-### 1️⃣ Analytics Service Setup (FastAPI)
+### 2. Backend Setup
 
 ```bash
-cd analytics-service
+cd backend
+npm install
 
-# Quick start
-chmod +x start.sh
-Create `backend/.env`:
-```env
-NODE_ENV=development
-PORT=5000
-CORS_ORIGIN=http://localhost:5173
+# Copy environment config
+cp .env.example .env
+# Fill in your values (see Environment Variables section)
 
-# MongoDB Connection
-MONGODB_URI=mongodb://localhost:27017/hostel-food-analysis
-
-# Analytics Service URL
-ANALYTICS_API_URL=http://localhost:8000
-
-# Firebase Configuration
-FIREBASE_PROJECT_ID=your-firebase-project-id
-FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
-FIREBASE_CLIENT_EMAIL=firebase-adminsdk@your-project.iam.gserviceaccount.com
-```
-
-**Start Backend:**
-```bash
+# Start development server
 npm run dev
 ```
-The backend uses the root Python virtual environment at `.venv/bin/python`.
 
-Create virtual environment and install dependencies:
+Backend runs at: `http://localhost:5000`
+
+---
+
+### 3. Analytics Service Setup
+
 ```bash
-# From project root
-python3 -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-
-# Install analytics dependencies
 cd analytics-service
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
+
+# Install dependencies
 pip install -r requirements.txt
+
+# Copy environment config
+cp .env.example .env
+# Set MONGODB_URI to match your backend's MongoDB connection
+
+# Start analytics service
+uvicorn main:app --reload --port 8000
 ```
 
-**Environment Setup:**
-- The Python scripts read `MONGODB_URI` from environment variables
-- Ensure MongoDB is running and accessible
+Analytics service runs at: `http://localhost:8000`
+Swagger docs at: `http://localhost:8000/docs`
 
-**Test Analytics Service:**
-```bash
-# From analytics-service directory
-### 3️⃣ Frontend Setup
+---
+
+### 4. Frontend Setup
 
 ```bash
 cd frontend
 npm install
+
+# Create .env file
+echo "VITE_API_URL=http://localhost:5000/api" > .env
+# Add Firebase config variables (see Environment Variables)
+
+# Start development server
+npm run dev
 ```
 
-Create `frontend/.env`:
+Frontend runs at: `http://localhost:5173`
+
+---
+
+### 5. Seed Data (Optional)
+
+```bash
+# Insert a weekly menu
+cd backend
+node scripts/insert-weekly-menu.js
+
+# Bulk register students (edit the script first)
+npm run bulk-register
+
+# Generate test feedback for analytics testing
+npm run generate-feedback
+```
+
+---
+
+## 🔑 Environment Variables
+
+### Backend — `backend/.env`
+
 ```env
-# Backend API URL
+NODE_ENV=development
+PORT=5000
+
+# MongoDB
+MONGODB_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/hostel-food-analysis
+
+# Analytics Microservice
+ANALYTICS_API_URL=http://localhost:8000
+
+# JWT
+JWT_SECRET=<64-char-hex-string>
+
+# Firebase Admin SDK (from Firebase Console → Service Accounts)
+FIREBASE_PROJECT_ID=your-firebase-project-id
+FIREBASE_PRIVATE_KEY_ID=your_private_key_id
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-project.iam.gserviceaccount.com
+
+# Firebase Web SDK (used by bulk-register script)
+FIREBASE_API_KEY=your_firebase_api_key
+FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+FIREBASE_APP_ID=your_app_id
+
+# CORS
+CORS_ORIGIN=http://localhost:5173
+```
+
+### Analytics Service — `analytics-service/.env`
+
+```env
+PORT=8000
+HOST=0.0.0.0
+ENVIRONMENT=development
+
+# Must match backend's MongoDB URI
+MONGODB_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/hostel-food-analysis
+
+# CORS (comma-separated origins)
+CORS_ORIGINS=http://localhost:5173,http://localhost:5000
+```
+
+### Frontend — `frontend/.env`
+
+```env
 VITE_API_URL=http://localhost:5000/api
 
-# Firebase Web Configuration
-# Get these from Firebase Console → Project Settings → Web App
-VITE_FIREBASE_API_KEY=your-api-key
-VITE_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
+# Firebase Web SDK (from Firebase Console → Project Settings)
+VITE_FIREBASE_API_KEY=your_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=your-project-id
-VITE_FIREBASE_STORAGE_BUCKET=your-project-id.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
-VITE_FIREBASE_APP_ID=your-app-id
+VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
 ```
 
-**Firebase Web App Setup:**
-1. Firebase Console → Project Settings → General
-2. Under "Your apps", click Web icon (</>) 
-3. Register app and copy configuration
-## 📖 Usage Guide
+---
 
-### Student Workflow
-1. **Register/Login** → Firebase authentication
-2. **Complete Profile** → First-time registration creates MongoDB user
-3. **View Menu** → Check today's meals
-4. **Submit Feedback** → Rate and comment on meals (time-based availability)
-5. **Track Progress** → View submission statistics
-
-### Admin Workflow
-1. **Login** → Firebase authentication with admin privileges
-2. **Select Date** → Choose analysis date
-3. **View Analytics** → Comprehensive dashboard with:
-   - Participation metrics
-   - Rating distributions
-   - Sentiment analysis
-   - Visual charts
-## 🔌 API Endpoints
-
-### 🔐 Authentication (`/api/auth`)
-| Method | Endpoint | Description | Access |
-|--------|----------|-------------|--------|
-| POST | `/register` | Create user profile | Public (requires Firebase token) |
-| POST | `/sync-user` | Sync Firebase user to MongoDB | Public (requires Firebase token) |
-| GET | `/me` | Get current user profile | Private |
-| POST | `/logout` | Logout user | Private |
-
-### 👥 Users (`/api/users`)
-| Method | Endpoint | Description | Access |
-|--------|----------|-------------|--------|
-| GET | `/profile` | Get own profile | Private |
-| PUT | `/profile` | Update own profile | Private |
-| GET | `/all` | List all users | Admin |
-| GET | `/:userId` | Get user by ID | Private |
-| PUT | `/:userId/admin` | Toggle admin status | Admin |
-| PUT | `/:userId/status` | Toggle active status | Admin |
-| GET | `/stats/overview` | User statistics | Admin |
-
-### 📝 Feedback (`/api/feedback`)
-| Method | Endpoint | Description | Access |
-|--------|----------|-------------|--------|
-| POST | `/submit` | Submit meal feedback | Private |
-| GET | `/my-feedback` | Get today's feedback | Private |
-| GET | `/all` | Get all feedback (filtered) | Admin |
-
-### 🍽️ Menu (`/api/menu`)
-| Method | Endpoint | Description | Access |
-|--------|----------|-------------|--------|
-| POST | `/weekly` | Create weekly menu | Admin |
-| GET | `/current` | Get current week menu | Private |
-| GET | `/today` | Get today's menu | Private |
-| GET | `/date/:date` | Get menu by date | Private |
-## 🏛️ System Architecture
+## 🔐 Authentication Flow
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                     CLIENT LAYER                            │
-│  ┌────────────────────────────────────────────────────┐     │
-│  │  React Frontend (Vite + Tailwind)                  │     │
-│  │  - Student Dashboard                               │     │
-│  │  - Admin Analytics Dashboard                       │     │
-│  │  - Authentication (Firebase Client SDK)            │     │
-│  └────────────────────────────────────────────────────┘     │
-└─────────────────────────────────────────────────────────────┘
-                            ↓ HTTPS/REST API
-┌─────────────────────────────────────────────────────────────┐
-│                    APPLICATION LAYER                        │
-│  ┌────────────────────────────────────────────────────┐     │
-│  │  Express.js Backend                                │     │
-│  │  - REST API Routes                                 │     │
-│  │  - Firebase Token Verification                     │     │
-│  │  - Role-Based Access Control (RBAC)               │     │
-│  │  - Business Logic                                  │     │
-│  └────────────────────────────────────────────────────┘     │
-└─────────────────────────────────────────────────────────────┘
-                            ↓
-        ┌───────────────────┴───────────────────┐
-        ↓                                       ↓
-┌──────────────────┐              ┌─────────────────────────┐
-│  DATABASE LAYER  │              │  ANALYTICS SERVICE      │
-│                  │              │                         │
-│  MongoDB         │              │  Python Scripts         │
-│  - Users         │              │  - daily_analysis.py    │
-│  - Feedback      │←─────────────┤  - Chart Generation     │
-│  - Menus         │  PyMongo     │  - Sentiment Analysis   │
-└──────────────────┘              └─────────────────────────┘
+┌──────────┐                ┌─────────┐              ┌──────────┐  ┌──────────┐
+│  Client  │                │ Backend │              │ Firebase │  │ MongoDB  │
+└────┬─────┘                └────┬────┘              └────┬─────┘  └────┬─────┘
+     │                           │                       │              │
+     │  POST /api/auth/register  │                       │              │
+     │──────────────────────────▶│                       │              │
+     │                           │  createUser(email)    │              │
+     │                           │──────────────────────▶│              │
+     │                           │◀── Firebase UID ──────│              │
+     │                           │  save User to DB ────────────────────▶
+     │                           │◀───────────────────────────── saved ─│
+     │◀─── { idToken, user } ───│                       │              │
+     │  Store token in           │                       │              │
+     │  localStorage             │                       │              │
+     │                           │                       │              │
+     │  POST /api/auth/login     │                       │              │
+     │──────────────────────────▶│                       │              │
+     │                           │  signInWithPassword() │              │
+     │                           │──────────────────────▶│              │
+     │                           │◀──── ID Token ────────│              │
+     │◀─── { idToken, user } ───│                       │              │
+     │                           │                       │              │
+     │  Any protected request    │                       │              │
+     │  (Bearer: <idToken>)      │                       │              │
+     │──────────────────────────▶│                       │              │
+     │                           │  verifyIdToken()      │              │
+     │                           │──────────────────────▶│              │
+     │                           │◀── decoded uid ───────│              │
+     │                           │  lookup user by uid ──────────────────▶
+     │◀─── Protected Response ──│                       │              │
 ```
 
-### 🔄 Data Flow
+**Google Sign-In Flow:**
+1. Client triggers `signInWithPopup(GoogleAuthProvider)` — Firebase handles OAuth
+2. Client extracts `idToken` from Firebase result
+3. Client sends `idToken` to `POST /api/auth/google-login`
+4. Backend verifies token with Firebase Admin SDK
+5. If new user: creates MongoDB record; if existing: returns profile
+6. Backend returns a fresh `idToken` + user object to client
 
-1. **Authentication Flow:**
-   ```
-   User → Firebase Auth → Frontend → Backend (verify token) → MongoDB
-   ```
+---
 
-2. **Feedback Submission:**
-   ```
-   Student → Submit Rating → Backend API → MongoDB → Success Response
-   ```
+## 🔮 Future Improvements
 
-3. **Analytics Generation:**
-   ```
-   Admin → Select Date → Backend → Spawn Python Process → 
-   Python queries MongoDB → Generate Charts → Return JSON + Base64 Images → 
-   Backend → Frontend Display
-   ```
+- [ ] **Date-Range Analytics** — Weekly and monthly trend graphs (endpoint scaffolded)
+- [ ] **Email Notifications** — Remind students who haven't submitted feedback
+- [ ] **Export Reports** — PDF/CSV export of admin analytics
+- [ ] **Push Notifications** — Meal-time reminders via Firebase Cloud Messaging
+- [ ] **Mobile App** — React Native companion app for students
+- [ ] **AI Summaries** — LLM-generated daily food quality narrative
+- [ ] **Multi-Hostel Support** — Tenant-based architecture for multiple hostels
+- [ ] **Docker Compose** — One-command local setup for all three services
 
-4. **Chart Serving:**
-   ```
-   Generated charts saved to: analytics-service/output/daily/{date}/
-   Served via: GET /analytics-images/daily/{date}/{chart-name}.png
-   ```
-
-## 📚 Documentation
-
-- **[IMPLEMENTATION.md](./IMPLEMENTATION.md)** — Detailed implementation guide
-- **[DEVELOPER_GUIDE.md](./DEVELOPER_GUIDE.md)** — Developer workflow and architecture
-
+---
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
+Contributions are welcome!
 
-## 📝 License
+```bash
+# Fork the repo, then:
+git checkout -b feature/your-feature-name
+git commit -m "feat: add your feature"
+git push origin feature/your-feature-name
+# Open a Pull Request
+```
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Please follow conventional commits and ensure code is tested before opening a PR.
 
-## 👨‍💻 Authors
+---
 
-- **Karthick** - [Karthick9298](https://github.com/Karthick9298)
+<div align="center">
 
-## 🙏 Acknowledgments
+Made with ❤️ for GVP Hostel Students
 
-- GVP College of Engineering (Autonomous)
-- Firebase for authentication services
-- MongoDB for database solutions
-- React and Express.js communities.js
+</div>
