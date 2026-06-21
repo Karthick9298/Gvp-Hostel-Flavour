@@ -1,58 +1,49 @@
 import axios from 'axios';
 
-// Create axios instance with base configuration
+// Create axios instance
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
-  timeout: 100000,
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Request interceptor to add auth token
+// Request interceptor — attach JWT token to every request
 api.interceptors.request.use(
   (config) => {
-    const authToken = localStorage.getItem('authToken');
-    if (authToken) {
-      config.headers.Authorization = `Bearer ${authToken}`;
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Response interceptor to handle errors
+// Response interceptor — handle 401 globally
 api.interceptors.response.use(
-  (response) => {
-    return response.data;
-  },
+  (response) => response.data,
   (error) => {
-    // Handle common errors
     if (error.response?.status === 401) {
-      // Unauthorized - remove token and redirect to login
       localStorage.removeItem('authToken');
-      if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+      if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }
     }
-    
-    // Return full error object for better error handling
     return Promise.reject(error);
   }
 );
 
-// API methods
+// ── Auth API ──────────────────────────────────────────────────
 export const authAPI = {
-  register: (data) => api.post('/auth/register', data),
   login: (data) => api.post('/auth/login', data),
-  googleLogin: (idToken) => api.post('/auth/google-login', { idToken }),
-  syncUser: () => api.post('/auth/sync-user'),
   getMe: () => api.get('/auth/me'),
   logout: () => api.post('/auth/logout'),
+  changePassword: (data) => api.put('/auth/change-password', data),
 };
 
+// ── Feedback API ──────────────────────────────────────────────
 export const feedbackAPI = {
   submit: (data) => api.post('/feedback/submit', data),
   getMyFeedback: () => api.get('/feedback/my-feedback'),
@@ -60,22 +51,21 @@ export const feedbackAPI = {
   getAll: (params) => api.get('/feedback/all', { params }),
 };
 
+// ── Analytics API ─────────────────────────────────────────────
 export const analyticsAPI = {
-  getDashboard: (params) => api.get('/analytics/dashboard', { params }),
-  getComments: (params) => api.get('/analytics/comments', { params }),
   getDailyAnalysis: (date) => api.get(`/analytics/daily/${date}`),
+  getSystemHealth: () => api.get('/analytics/system/health'),
 };
 
+// ── User API ──────────────────────────────────────────────────
 export const userAPI = {
   getProfile: () => api.get('/users/profile'),
   updateProfile: (data) => api.put('/users/profile', data),
   getAll: (params) => api.get('/users/all', { params }),
   getUserById: (userId) => api.get(`/users/${userId}`),
-  toggleAdmin: (userId, isAdmin) => api.put(`/users/${userId}/admin`, { isAdmin }),
-  toggleStatus: (userId, isActive) => api.put(`/users/${userId}/status`, { isActive }),
-  getStats: () => api.get('/users/stats/overview'),
 };
 
+// ── Menu API ──────────────────────────────────────────────────
 export const menuAPI = {
   getCurrentWeek: () => api.get('/menu/current'),
   getToday: () => api.get('/menu/today'),

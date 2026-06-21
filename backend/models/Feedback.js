@@ -22,7 +22,7 @@ const feedbackSchema = new mongoose.Schema({
     morning: {
       rating: {
         type: Number,
-        min: [0, 'Rating cannot be less than 0'],
+        min: [1, 'Rating cannot be less than 1'],
         max: [5, 'Rating cannot be more than 5'],
         default: null
       },
@@ -40,7 +40,7 @@ const feedbackSchema = new mongoose.Schema({
     afternoon: {
       rating: {
         type: Number,
-        min: [0, 'Rating cannot be less than 0'],
+        min: [1, 'Rating cannot be less than 1'],
         max: [5, 'Rating cannot be more than 5'],
         default: null
       },
@@ -58,7 +58,7 @@ const feedbackSchema = new mongoose.Schema({
     evening: {
       rating: {
         type: Number,
-        min: [0, 'Rating cannot be less than 0'],
+        min: [1, 'Rating cannot be less than 1'],
         max: [5, 'Rating cannot be more than 5'],
         default: null
       },
@@ -76,7 +76,7 @@ const feedbackSchema = new mongoose.Schema({
     night: {
       rating: {
         type: Number,
-        min: [0, 'Rating cannot be less than 0'],
+        min: [1, 'Rating cannot be less than 1'],
         max: [5, 'Rating cannot be more than 5'],
         default: null
       },
@@ -110,7 +110,6 @@ feedbackSchema.methods.canSubmitMeal = function(mealType) {
   const istTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
   const currentHour = istTime.getHours();
   
-  // console.log(`Debug: Current IST time: ${istTime.toLocaleString()}, Hour: ${currentHour}, Meal: ${mealType}`);
 
   // Check if meal is already submitted
   if (this.meals[mealType].rating !== null) {
@@ -135,14 +134,14 @@ feedbackSchema.methods.canSubmitMeal = function(mealType) {
     
     case 'evening':
       // Evening meal can be submitted from 5 PM till midnight (11:59 PM)
-      if (currentHour >= 13) {
+      if (currentHour >= 17) {
         return { canSubmit: true };
       }
       return { canSubmit: false, reason: `Evening meal feedback can only be submitted from 5 PM onwards. Current time: ${currentHour}:00` };
     
     case 'night':
       // Night meal can be submitted from 8 PM till midnight (11:59 PM)
-      if (currentHour >= 13) {
+      if (currentHour >= 20) {
         return { canSubmit: true };
       }
       return { canSubmit: false, reason: `Night meal feedback can only be submitted from 8 PM onwards. Current time: ${currentHour}:00` };

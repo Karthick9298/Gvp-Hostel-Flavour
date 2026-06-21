@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -14,6 +15,11 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     trim: true,
     match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please provide a valid email']
+  },
+  password: {
+    type: String,
+    minlength: [6, 'Password must be at least 6 characters'],
+    select: false  // Never return password in queries by default
   },
   rollNumber: {
     type: String,
@@ -32,34 +38,37 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  firebaseUid: {
-    type: String,
-    required: [true, 'Firebase UID is required'],
-    unique: true
+  isActive: {
+    type: Boolean,
+    default: true
   },
   lastLogin: {
     type: Date,
     default: Date.now
-  },
-  isActive: {
-    type: Boolean,
-    default: true
   }
 }, {
   timestamps: true
 });
 
-// Indexes are automatically created for unique fields
-// Additional indexes can be added here if needed for non-unique fields
-
-// Virtual for user's full display name
-userSchema.virtual('displayName').get(function() {
-  return `${this.name} (${this.rollNumber})`;
+// Hash password before saving (only when password is modified)
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password') || !this.password) return next();
+  try {
+    this.password = await bcrypt.hash(this.password, 12);
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
 
-// Method to check if user is admin
-userSchema.methods.isAdminUser = function() {
-  return this.isAdmin;
+// Instance method: compare entered password with hashed password
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return bcrypt.compare(candidatePassword, this.password);
 };
+
+// Virtual for display name
+userSchema.virtual('displayName').get(function () {
+  return `${this.name} (${this.rollNumber})`;
+});
 
 export default mongoose.model('User', userSchema);

@@ -1,26 +1,25 @@
+import dotenv from 'dotenv';
+
+// Load environment variables FIRST — before any other imports read process.env
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
-import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
+
+import { startKeepAliveCron } from './cron/keepAliveCron.js';
+import { startDailyAnalyticsCron } from './cron/dailyAnalyticsCron.js';
+
 import connectDB from './config/database.js';
 
-// Get current directory for ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 // Import Routes
-import authRoutes from './routes/auth-firebase.js';
+import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
 import feedbackRoutes from './routes/feedback.js';
 import analyticsRoutes from './routes/analytics.js';
 import menuRoutes from './routes/menu.js';
-
-// Load environment variables
-dotenv.config();
 
 // Initialize Express app
 const app = express();
@@ -28,56 +27,67 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-// Security middleware
+// ── Security Middleware ──────────────────────────────────────
 app.use(helmet());
 
-// CORS configuration
-let origin = process.env.CORS_ORIGIN || 'http://localhost:5173';
-if (process.env.NODE_ENV === 'development') {
-  origin = 'http://localhost:5173';
-}
+// ── CORS ─────────────────────────────────────────────────────
+const corsOrigin = process.env.NODE_ENV === 'production'
+  ? process.env.CORS_ORIGIN
+  : 'http://localhost:5173';
+
 app.use(cors({
-  origin: origin,
+  origin: corsOrigin,
   credentials: true
 }));
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.'
+// ── Rate Limiting ─────────────────────────────────────────────
+// Strict limit for auth routes (prevent brute force)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,  // 15 minutes
+  max: 20,
+  message: { status: 'error', message: 'Too many login attempts. Please try again later.' }
 });
-app.use(limiter);
 
-// Body parsing middleware
-app.use(express.json({ limit: '10mb' }));
+// General limit for all other routes
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 200,
+  message: { status: 'error', message: 'Too many requests. Please try again later.' }
+});
+
+app.use('/api/auth', authLimiter);
+app.use('/api/users', generalLimiter);
+app.use('/api/feedback', generalLimiter);
+app.use('/api/analytics', generalLimiter);
+app.use('/api/menu', generalLimiter);
+
+// ── Body Parsing ──────────────────────────────────────────────
+app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Logging middleware
+// ── Logging (development only) ────────────────────────────────
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-// Removed static file serving - charts are now served directly from analytics service
-
-// Health check endpoint
+// ── Health Check ──────────────────────────────────────────────
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'success',
-    message: 'Server is running successfully',
+    message: 'Server is running',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV
   });
 });
 
-// API Routes
+// ── API Routes ────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/menu', menuRoutes);
 
-// 404 handler
+// ── 404 Handler ───────────────────────────────────────────────
 app.use('*', (req, res) => {
   res.status(404).json({
     status: 'error',
@@ -85,10 +95,9 @@ app.use('*', (req, res) => {
   });
 });
 
-// Global error handler
+// ── Global Error Handler ──────────────────────────────────────
 app.use((err, req, res, next) => {
-  console.error('Error:', err);
-  
+  console.error('Unhandled error:', err);
   res.status(err.status || 500).json({
     status: 'error',
     message: err.message || 'Internal server error',
@@ -96,9 +105,17 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
+
+
+// ── Start Server ──────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
-  console.log(`📊 Health check available at http://localhost:${PORT}/health`);
+  console.log(`🚀 Server running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
+  console.log(`✅ Health check: http://localhost:${PORT}/health`);
+
+
+// Trigger nodemon restart to clear rate limit cache
+
+  startKeepAliveCron(PORT);
+  startDailyAnalyticsCron();
 });

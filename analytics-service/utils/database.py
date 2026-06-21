@@ -7,7 +7,9 @@ import os
 import sys
 import json
 from datetime import datetime, timedelta
+# pyrefly: ignore [missing-import]
 from pymongo import MongoClient
+# pyrefly: ignore [missing-import]
 from dotenv import load_dotenv
 
 # Load environment variables from analytics-service .env
@@ -20,7 +22,7 @@ else:
 
 class DatabaseConnection:
     def __init__(self):
-        self.mongo_uri = os.getenv('MONGODB_URI', 'mongodb://localhost:27017/hostel-food-analysis')
+        self.mongo_uri = os.getenv('MONGODB_URI')
         self.client = None
         self.db = None
         
@@ -72,37 +74,4 @@ class DatabaseConnection:
     def get_users_collection(self):
         """Get users collection"""
         return self.db.users
-
-
-# For weekly or more than analysis , we need this 
-def get_date_range(date_str):
-    """Get start and end datetime for a specific day"""
-    try:
-        target_date = datetime.strptime(date_str, '%Y-%m-%d')
-    except ValueError:
-        target_date = datetime.now() - timedelta(days=1)
-    
-    start_date = target_date.replace(hour=0, minute=0, second=0, microsecond=0)
-    end_date = start_date + timedelta(days=1)
-    
-    return start_date, end_date
-
-def safe_json_output(data):
-    """Safely output JSON data to stdout"""
-    try:
-        print(json.dumps(data, default=str))
-        sys.stdout.flush()
-    except Exception as e:
-        print(json.dumps({"error": True, "message": f"JSON serialization failed: {str(e)}"}))
-        sys.stdout.flush()
-
-def handle_error(message, error_type="ERROR"):
-    """Handle and output errors as JSON"""
-    error_data = {
-        "error": True,
-        "message": message,
-        "type": error_type,
-        "timestamp": datetime.now().isoformat()
-    }
-    safe_json_output(error_data)
 

@@ -1,7 +1,7 @@
 import express from 'express';
 import { body, query, validationResult } from 'express-validator';
 import WeeklyMenu from '../models/WeeklyMenu.js';
-import { authenticateFirebaseToken, requireAdmin } from '../middleware/firebaseAuth.js';
+import { authenticateToken, requireAdmin } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -9,7 +9,7 @@ const router = express.Router();
 // @desc    Create a new weekly menu template (Admin only)
 // @access  Private (Admin)
 router.post('/weekly', [
-  authenticateFirebaseToken,
+  authenticateToken,
   requireAdmin,
   body('name')
     .optional()
@@ -70,7 +70,7 @@ router.post('/weekly', [
 // @route   GET /api/menu/current
 // @desc    Get current week's menu (same as active menu)
 // @access  Private
-router.get('/current', authenticateFirebaseToken, async (req, res) => {
+router.get('/current', authenticateToken, async (req, res) => {
   try {
     const currentMenu = await WeeklyMenu.getActiveMenu();
     
@@ -100,7 +100,7 @@ router.get('/current', authenticateFirebaseToken, async (req, res) => {
 // @route   GET /api/menu/today
 // @desc    Get today's menu
 // @access  Private
-router.get('/today', authenticateFirebaseToken, async (req, res) => {
+router.get('/today', authenticateToken, async (req, res) => {
   try {
     const todayMenu = await WeeklyMenu.getTodaysMenu();
     
@@ -130,7 +130,7 @@ router.get('/today', authenticateFirebaseToken, async (req, res) => {
 // @route   GET /api/menu/date/:date
 // @desc    Get menu for specific day (monday, tuesday, etc.)
 // @access  Private
-router.get('/date/:date', authenticateFirebaseToken, async (req, res) => {
+router.get('/date/:date', authenticateToken, async (req, res) => {
   try {
     const { date } = req.params;
     
@@ -182,7 +182,7 @@ router.get('/date/:date', authenticateFirebaseToken, async (req, res) => {
 // @route   GET /api/menu/weekly
 // @desc    Get all weekly menus (Admin only)
 // @access  Private (Admin)
-router.get('/weekly', [authenticateFirebaseToken, requireAdmin], async (req, res) => {
+router.get('/weekly', [authenticateToken, requireAdmin], async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
     const skip = (page - 1) * limit;
@@ -221,7 +221,7 @@ router.get('/weekly', [authenticateFirebaseToken, requireAdmin], async (req, res
 // @desc    Update weekly menu (Admin only)
 // @access  Private (Admin)
 router.put('/weekly/:id', [
-  authenticateFirebaseToken,
+  authenticateToken,
   requireAdmin
 ], async (req, res) => {
   try {
@@ -262,7 +262,7 @@ router.put('/weekly/:id', [
 // @route   DELETE /api/menu/weekly/:id
 // @desc    Delete weekly menu (Admin only)
 // @access  Private (Admin)
-router.delete('/weekly/:id', [authenticateFirebaseToken, requireAdmin], async (req, res) => {
+router.delete('/weekly/:id', [authenticateToken, requireAdmin], async (req, res) => {
   try {
     const { id } = req.params;
 

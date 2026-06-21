@@ -2,7 +2,7 @@ import express from 'express';
 import { body, param, validationResult } from 'express-validator';
 import Feedback from '../models/Feedback.js';
 import User from '../models/User.js';
-import { authenticateFirebaseToken, requireAdmin } from '../middleware/firebaseAuth.js';
+import { authenticateToken, requireAdmin } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -10,13 +10,13 @@ const router = express.Router();
 // @desc    Submit feedback for a meal
 // @access  Private
 router.post('/submit', [
-  authenticateFirebaseToken,
+  authenticateToken,
   body('mealType')
     .isIn(['morning', 'afternoon', 'evening', 'night'])
     .withMessage('Invalid meal type'),
   body('rating')
-    .isFloat({ min: 0, max: 5 })
-    .withMessage('Rating must be between 0 and 5'),
+    .isFloat({ min: 1, max: 5 })
+    .withMessage('Rating must be between 1 and 5'),
   body('comment')
     .optional()
     .trim()
@@ -43,7 +43,7 @@ router.post('/submit', [
     const currentDate = new Date(istTime.getFullYear(), istTime.getMonth(), istTime.getDate());
     currentDate.setHours(0, 0, 0, 0); // Ensure time is 00:00:00.000
 
-    // console.log(`Debug Feedback Submit: User ${userId}, Current Date: ${currentDate.toISOString()}, IST Time: ${istTime.toLocaleString()}`);
+
 
     // Find or create feedback document for today
     let feedback = await Feedback.findOne({
@@ -52,7 +52,6 @@ router.post('/submit', [
     });
 
     if (!feedback) {
-      // console.log(`Creating new feedback document for user ${userId} on date ${currentDate.toISOString()}`);
       feedback = new Feedback({
         user: userId,
         date: currentDate,
@@ -63,9 +62,6 @@ router.post('/submit', [
           night: { rating: null, comment: '', submittedAt: null }
         }
       });
-    } else {
-      // console.log(`Found existing feedback document for user ${userId} on date ${currentDate.toISOString()}`);
-      // console.log(`Current meal ${mealType} status:`, feedback.meals[mealType]);
     }
 
     // Check if meal can be submitted
@@ -116,7 +112,7 @@ router.post('/submit', [
 // @route   GET /api/feedback/my-feedback
 // @desc    Get current user's feedback for today
 // @access  Private
-router.get('/my-feedback', authenticateFirebaseToken, async (req, res) => {
+router.get('/my-feedback', authenticateToken, async (req, res) => {
   try {
     const userId = req.user._id;
 
@@ -133,7 +129,6 @@ router.get('/my-feedback', authenticateFirebaseToken, async (req, res) => {
     });
 
     if (!feedback) {
-      // console.log(`No feedback found for user ${userId} on date ${currentDate.toISOString()}, creating empty structure`);
       // Create empty feedback structure
       feedback = {
         _id: null,
@@ -148,9 +143,6 @@ router.get('/my-feedback', authenticateFirebaseToken, async (req, res) => {
         createdAt: currentDate,
         updatedAt: currentDate
       };
-    } else {
-      // console.log(`Found existing feedback for user ${userId} on date ${currentDate.toISOString()}`);
-      // console.log('Feedback meals:', JSON.stringify(feedback.meals, null, 2));
     }
 
     // Get submission statistics (manually calculate for empty feedback)
@@ -190,7 +182,7 @@ router.get('/my-feedback', authenticateFirebaseToken, async (req, res) => {
 // @route   GET /api/feedback/submission-stats
 // @desc    Get submission statistics for students (how many submitted)
 // @access  Private
-router.get('/submission-stats', authenticateFirebaseToken, async (req, res) => {
+router.get('/submission-stats', authenticateToken, async (req, res) => {
   try {
     const { date } = req.query;
     
@@ -259,7 +251,7 @@ router.get('/submission-stats', authenticateFirebaseToken, async (req, res) => {
 // @route   GET /api/feedback/all
 // @desc    Get all feedback (Admin only)
 // @access  Private/Admin
-router.get('/all', [authenticateFirebaseToken, requireAdmin], async (req, res) => {
+router.get('/all', [authenticateToken, requireAdmin], async (req, res) => {
   try {
     const { 
       date, 
@@ -288,8 +280,8 @@ router.get('/all', [authenticateFirebaseToken, requireAdmin], async (req, res) =
     const feedbacks = await Feedback.find(query)
       .populate('user', 'name email rollNumber hostelRoom')
       .sort({ date: -1, createdAt: -1 })
-      .limit(limit * 1)
-      .skip((page - 1) * limit);
+      .limit(parseInt(limit, 10))
+      .skip((page - 1) * parseInt(limit, 10));
 
     // Get total count for pagination
     const total = await Feedback.countDocuments(query);

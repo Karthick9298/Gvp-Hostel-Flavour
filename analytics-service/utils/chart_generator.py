@@ -7,11 +7,16 @@ Enhanced with modern dark theme matching the frontend UI
 import os
 import base64
 from io import BytesIO
+# pyrefly: ignore [missing-import]
 import matplotlib
 matplotlib.use('Agg')  # Non-interactive backend
+# pyrefly: ignore [missing-import]
 import matplotlib.pyplot as plt
 import seaborn as sns
+# pyrefly: ignore [missing-import]
 import numpy as np
+
+# pyrefly: ignore [missing-import]
 from textblob import TextBlob
 
 # Set modern dark theme to match frontend
@@ -86,11 +91,6 @@ class ChartGenerator:
                 return 'neutral', polarity
         except:
             return 'neutral', 0.0
-        
-        return {
-            'path': filepath,
-            'base64': f'data:image/png;base64,{image_base64}'
-        }
     
     def generate_avg_ratings_chart(self, data):
         """Generate modern average ratings bar chart with gradient effects (base64 only)"""
@@ -189,7 +189,6 @@ class ChartGenerator:
     
     def generate_rating_distribution_chart(self, data):
         """Generate 4 modern bar charts for rating distribution - one per meal (base64 only)"""
-        distribution_data = data.get('feedbackDistributionPerMeal', {})
         distribution_data = data.get('feedbackDistributionPerMeal', {})
         
         if not distribution_data:

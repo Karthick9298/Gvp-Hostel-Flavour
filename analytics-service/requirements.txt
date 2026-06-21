@@ -18,6 +18,3 @@ textblob>=0.17.0
 
 # Utilities
 python-dotenv>=1.0.0
-
-# HTTP client for testing
-httpx>=0.25.0

@@ -4,13 +4,16 @@ FastAPI Analytics Service
 Independent microservice for hostel food feedback analytics
 """
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Security, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from typing import Optional
 import os
 from dotenv import load_dotenv
+
+# IST offset constant (UTC+5:30)
+IST_OFFSET = timedelta(hours=5, minutes=30)
 
 # Import analysis modules
 from services.daily_analysis_core import analyze_daily_feedback
@@ -37,6 +40,22 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Security Configuration
+from fastapi.security.api_key import APIKeyHeader
+API_KEY_NAME = "X-API-Key"
+api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
+
+async def get_api_key(api_key: str = Security(api_key_header)):
+    expected_api_key = os.getenv("SERVICE_API_KEY")
+    if expected_api_key and api_key == expected_api_key:
+        return api_key
+    elif not expected_api_key and os.getenv("ENVIRONMENT", "development") == "development":
+        return api_key
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Could not validate API KEY"
+    )
 
 
 @app.get("/")
@@ -72,7 +91,8 @@ async def health_check():
 @app.get("/api/analytics/daily/{date}")
 async def get_daily_analysis(
     date: str,
-    include_charts: bool = Query(True, description="Include base64 chart images")
+    include_charts: bool = Query(True, description="Include base64 chart images"),
+    api_key: str = Depends(get_api_key)
 ):
     """
     Get comprehensive daily analytics for a specific date
@@ -98,9 +118,11 @@ async def get_daily_analysis(
             detail="Invalid date format. Use YYYY-MM-DD"
         )
     
-    # Check if date is in the future
-    today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    if requested_date > today:
+    # Check if date is in the future (compare in IST, not server local time)
+    now_utc = datetime.now(timezone.utc)
+    now_ist = now_utc + IST_OFFSET
+    today_ist = now_ist.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
+    if requested_date > today_ist:
         return JSONResponse(
             status_code=200,
             content={
@@ -153,6 +175,7 @@ async def get_daily_analysis(
 async def get_date_range_analysis(
     start_date: str = Query(..., description="Start date (YYYY-MM-DD)"),
     end_date: str = Query(..., description="End date (YYYY-MM-DD)"),
+    api_key: str = Depends(get_api_key)
 ):
     """
     Get analytics for a date range (future enhancement)
@@ -165,7 +188,8 @@ async def get_date_range_analysis(
 
 @app.get("/api/analytics/trends")
 async def get_trends(
-    days: int = Query(7, description="Number of days to analyze", ge=1, le=30)
+    days: int = Query(7, description="Number of days to analyze", ge=1, le=30),
+    api_key: str = Depends(get_api_key)
 ):
     """
     Get trend analysis for the last N days (future enhancement)

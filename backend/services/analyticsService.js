@@ -1,7 +1,4 @@
 import axios from 'axios';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 class AnalyticsService {
   constructor() {
@@ -22,7 +19,11 @@ class AnalyticsService {
           params: {
             include_charts: true
           },
-          timeout: 100000 // 60 second timeout
+          headers: {
+            'X-API-Key': process.env.ANALYTICS_API_SECRET || ''
+          },
+          timeout: 10000 // 10 second timeout
+          
         }
       );
       
@@ -99,7 +100,12 @@ class AnalyticsService {
     try {
       const response = await axios.get(
         `${this.analyticsApiUrl}/health`,
-        { timeout: 5000 }
+        { 
+          timeout: 5000,
+          headers: {
+            'X-API-Key': process.env.ANALYTICS_API_SECRET || ''
+          }
+        }
       );
       
       return {

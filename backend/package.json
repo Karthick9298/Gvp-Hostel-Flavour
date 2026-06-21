@@ -1,16 +1,15 @@
 {
   "name": "hostel-food-analysis-backend",
-  "version": "1.0.0",
-  "description": "Backend for Hostel Food Analysis Platform",
+  "version": "2.0.0",
+  "description": "Backend for Hostel Food Analysis Platform (JWT Auth)",
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "NODE_ENV=production node server.js",
-    "dev": "NODE_ENV=development nodemon server.js",
+    "start": "set NODE_ENV=production && node server.js",
+    "dev": "set NODE_ENV=development && nodemon server.js",
     "test": "jest",
+    "set-passwords": "node scripts/set-default-passwords.js",
     "bulk-register": "node scripts/bulk-register-users.js",
-    "bulk-delete": "node scripts/bulk-delete-users.js",
-    "simple-delete": "node scripts/simple-delete-users.js",
     "generate-feedback": "node scripts/generate-test-feedback.js"
   },
   "dependencies": {
@@ -21,13 +20,11 @@
     "express": "^4.18.2",
     "express-rate-limit": "^7.1.5",
     "express-validator": "^7.0.1",
-    "firebase": "^12.4.0",
-    "firebase-admin": "^13.5.0",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
-    "moment-timezone": "^0.5.43",
     "mongoose": "^8.0.0",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "node-cron": "^4.4.1"
   },
   "devDependencies": {
     "jest": "^29.7.0",
@@ -37,11 +34,11 @@
     "hostel",
     "food",
     "feedback",
-    "analysis",
     "nodejs",
     "express",
-    "mongodb"
+    "mongodb",
+    "jwt"
   ],
-  "author": "Your Name",
+  "author": "GVP Hostel",
   "license": "MIT"
 }

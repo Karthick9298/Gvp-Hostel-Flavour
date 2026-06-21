@@ -113,7 +113,7 @@ const comments = {
 // Generate realistic rating with balanced distribution for better analysis
 const generateRating = () => {
   const random = Math.random();
-  
+
   // More balanced distribution for realistic feedback analysis
   if (random < 0.12) return 1;      // 12% - Very poor (issues to identify)
   else if (random < 0.25) return 2; // 13% - Poor (improvement areas)
@@ -131,10 +131,10 @@ const generateMealSpecificRating = (mealType, baseRating) => {
     evening: 0.0,    // Dinner average
     night: -0.2      // Night snacks often have issues (limited options, cold food)
   };
-  
+
   const modifier = mealModifiers[mealType] || 0;
   const random = Math.random();
-  
+
   // Apply meal-specific bias
   if (modifier < 0 && random < Math.abs(modifier)) {
     // Increase chance of lower rating for problematic meals
@@ -143,7 +143,7 @@ const generateMealSpecificRating = (mealType, baseRating) => {
     // Increase chance of higher rating for good meals
     return Math.min(5, baseRating + 1);
   }
-  
+
   return baseRating;
 };
 
@@ -159,7 +159,7 @@ const getDateQualityModifier = (dateIndex) => {
     5: { modifier: 0.15, description: "Great Friday, special menu" },          // Oct 17 - Friday
     6: { modifier: -0.05, description: "Weekend, reduced staff" }              // Oct 18 - Saturday
   };
-  
+
   return dateScenarios[dateIndex] || { modifier: 0, description: "Normal day" };
 };
 
@@ -167,7 +167,7 @@ const getDateQualityModifier = (dateIndex) => {
 const getFinalRating = (baseRating, mealType, dateIndex) => {
   const mealRating = generateMealSpecificRating(mealType, baseRating);
   const dateModifier = getDateQualityModifier(dateIndex);
-  
+
   // Apply date modifier with some randomness
   if (Math.random() < 0.3) { // 30% chance to apply date modifier
     if (dateModifier.modifier < 0) {
@@ -176,7 +176,7 @@ const getFinalRating = (baseRating, mealType, dateIndex) => {
       return Math.min(5, mealRating + 1);
     }
   }
-  
+
   return mealRating;
 };
 
@@ -184,7 +184,7 @@ const getFinalRating = (baseRating, mealType, dateIndex) => {
 const shouldSubmitFeedback = (mealType, rollNumber) => {
   // Use roll number as seed for consistent but random behavior per user
   const userSeed = parseInt(rollNumber) % 100;
-  
+
   // Base participation rates
   const baseRates = {
     morning: 0.75,   // 75% base rate for breakfast
@@ -192,10 +192,10 @@ const shouldSubmitFeedback = (mealType, rollNumber) => {
     evening: 0.85,   // 85% base rate for dinner
     night: 0.50      // 50% base rate for night snacks
   };
-  
+
   // Add user-specific variation based on roll number
   let participationRate = baseRates[mealType];
-  
+
   // Some users are more consistent (higher participation)
   if (userSeed < 20) {
     participationRate += 0.15; // Very active users
@@ -204,10 +204,10 @@ const shouldSubmitFeedback = (mealType, rollNumber) => {
   } else if (userSeed > 80) {
     participationRate -= 0.20; // Less active users
   }
-  
+
   // Ensure rate stays within bounds
   participationRate = Math.max(0.1, Math.min(0.95, participationRate));
-  
+
   return Math.random() < participationRate;
 };
 
@@ -215,7 +215,7 @@ const shouldSubmitFeedback = (mealType, rollNumber) => {
 const shouldSkipUserForDay = (rollNumber, dateIndex) => {
   // Use combination of roll number and date as seed for consistency
   const seed = (parseInt(rollNumber) + dateIndex * 17) % 100;
-  
+
   // 15% chance to skip the entire day
   return seed < 15;
 };
@@ -230,7 +230,7 @@ const getRandomComment = (rating) => {
 // Generate realistic submission time for each meal
 const getSubmissionTime = (date, mealType) => {
   const baseDate = new Date(date);
-  
+
   // Meal time windows (in IST hours)
   const mealWindows = {
     morning: { start: 9, end: 11 },    // 9 AM - 11 AM
@@ -238,11 +238,11 @@ const getSubmissionTime = (date, mealType) => {
     evening: { start: 19, end: 21 },   // 7 PM - 9 PM
     night: { start: 22, end: 23 }      // 10 PM - 11 PM
   };
-  
+
   const window = mealWindows[mealType];
   const randomHour = window.start + Math.random() * (window.end - window.start);
   const randomMinute = Math.floor(Math.random() * 60);
-  
+
   baseDate.setHours(Math.floor(randomHour), randomMinute, 0, 0);
   return baseDate;
 };
@@ -250,14 +250,14 @@ const getSubmissionTime = (date, mealType) => {
 // Generate specific date range: October 12-18, 2025
 const generateDateRange = () => {
   const dates = [];
-  
+
   // Create dates from Oct 12 to Oct 18, 2025
   for (let day = 12; day <= 18; day++) {
     const date = new Date(2025, 9, day); // Month is 0-indexed (9 = October)
     date.setHours(0, 0, 0, 0);
     dates.push(date);
   }
-  
+
   return dates;
 };
 
@@ -271,15 +271,15 @@ const generateTestFeedback = async () => {
   console.log('🎲 Features: Random user skipping + Random meal skipping');
   console.log(`📅 Start Time: ${startTime.toLocaleString()}`);
   console.log('');
-  
+
   try {
     // Connect to database
     console.log('🔌 Connecting to MongoDB...');
     await connectDB();
-    
+
     // Get users in the specified roll number range
     console.log('👥 Fetching user accounts in range 323103310001-323103310150...');
-    const users = await User.find({ 
+    const users = await User.find({
       isAdmin: false,
       rollNumber: {
         $gte: '323103310001',
@@ -287,12 +287,12 @@ const generateTestFeedback = async () => {
       }
     }).select('_id rollNumber name');
     console.log(`   Found ${users.length} student accounts in the specified range`);
-    
+
     if (users.length === 0) {
       console.log('❌ No student accounts found! Please run bulk registration first.');
       return;
     }
-    
+
     // Generate date range (October 12-18, 2025)
     const dates = generateDateRange();
     console.log(`📅 Generating feedback for October 12-18, 2025 (${dates.length} days):`);
@@ -300,44 +300,44 @@ const generateTestFeedback = async () => {
       console.log(`   ${index + 1}. ${date.toDateString()}`);
     });
     console.log('');
-    
+
     const mealTypes = ['morning', 'afternoon', 'evening', 'night'];
     let totalFeedbacks = 0;
     let totalMealRatings = 0;
-    
+
     // Clear existing feedback for testing
     console.log('🗑️  Clearing existing test feedback...');
     await Feedback.deleteMany({});
     console.log('   ✅ Cleared existing feedback data');
     console.log('');
-    
+
     // Generate feedback for each date
     for (let dateIndex = 0; dateIndex < dates.length; dateIndex++) {
       const currentDate = dates[dateIndex];
       const isToday = dateIndex === dates.length - 1;
       const dayScenario = getDateQualityModifier(dateIndex);
-      
+
       console.log(`📊 Day ${dateIndex + 1}/7: ${currentDate.toDateString()} ${isToday ? '(TODAY)' : ''}`);
       console.log(`   🎭 Scenario: ${dayScenario.description}`);
-      
+
       let dayFeedbacks = 0;
       let dayMealRatings = 0;
-      
+
       // Process users in batches for better performance
       const batchSize = 20;
       for (let i = 0; i < users.length; i += batchSize) {
         const userBatch = users.slice(i, Math.min(i + batchSize, users.length));
-        
+
         const feedbackPromises = userBatch.map(async (user) => {
           // Skip some users completely for this day (realistic absence)
           if (shouldSkipUserForDay(user.rollNumber, dateIndex)) {
             return 0; // User didn't participate this day
           }
-          
+
           // Each active user has varying participation
           const mealsFeedback = {};
           let userMealCount = 0;
-          
+
           // Generate feedback for each meal type with individual randomness
           mealTypes.forEach(mealType => {
             if (shouldSubmitFeedback(mealType, user.rollNumber)) {
@@ -345,13 +345,13 @@ const generateTestFeedback = async () => {
               const rating = getFinalRating(baseRating, mealType, dateIndex);
               const comment = getRandomComment(rating);
               const submittedAt = getSubmissionTime(currentDate, mealType);
-              
+
               mealsFeedback[mealType] = {
                 rating: rating,
                 comment: comment,
                 submittedAt: submittedAt
               };
-              
+
               userMealCount++;
             } else {
               // No feedback for this meal
@@ -362,7 +362,7 @@ const generateTestFeedback = async () => {
               };
             }
           });
-          
+
           // Only create feedback document if user submitted at least one meal
           if (userMealCount > 0) {
             const feedback = new Feedback({
@@ -370,41 +370,41 @@ const generateTestFeedback = async () => {
               date: currentDate,
               meals: mealsFeedback
             });
-            
+
             await feedback.save();
             dayMealRatings += userMealCount;
             return 1; // Count this feedback document
           }
           return 0;
         });
-        
+
         const batchResults = await Promise.all(feedbackPromises);
         dayFeedbacks += batchResults.reduce((sum, result) => sum + result, 0);
-        
+
         // Show progress
         const processed = Math.min(i + batchSize, users.length);
         process.stdout.write(`\r   📝 Processing users: ${processed}/${users.length}`);
       }
-      
+
       console.log(`\r   ✅ Day complete: ${dayFeedbacks} feedbacks, ${dayMealRatings} meal ratings`);
       totalFeedbacks += dayFeedbacks;
       totalMealRatings += dayMealRatings;
     }
-    
+
     // Generate summary statistics
     const endTime = new Date();
     const duration = Math.round((endTime - startTime) / 1000);
-    
+
     console.log('📊 GENERATION SUMMARY:');
     console.log('========================');
-    
+
     console.log(`⏱️  Duration: ${Math.floor(duration / 60)}m ${duration % 60}s`);
     console.log(`📋 Total Feedback Documents: ${totalFeedbacks}`);
     console.log(`🍽️  Total Meal Ratings: ${totalMealRatings}`);
     console.log(`👥 Total Users: ${users.length}`);
     console.log(`📅 Date Range: ${dates.length} days`);
     console.log(`📈 Average Participation: ${((totalFeedbacks / (users.length * dates.length)) * 100).toFixed(1)}%`);
-    
+
     // Show sample statistics
     console.log('\n📈 SAMPLE STATISTICS:');
     const sampleFeedback = await Feedback.aggregate([
@@ -412,7 +412,7 @@ const generateTestFeedback = async () => {
         $project: {
           ratings: [
             '$meals.morning.rating',
-            '$meals.afternoon.rating', 
+            '$meals.afternoon.rating',
             '$meals.evening.rating',
             '$meals.night.rating'
           ]
@@ -436,7 +436,7 @@ const generateTestFeedback = async () => {
         $sort: { _id: 1 }
       }
     ]);
-    
+
     console.log('   Rating Distribution:');
     sampleFeedback.forEach(stat => {
       if (stat._id !== null) {
@@ -444,13 +444,13 @@ const generateTestFeedback = async () => {
         console.log(`   ⭐ ${stat._id} stars: ${stat.count} ratings (${percentage}%)`);
       }
     });
-    
+
     // Show recent feedback examples
     const recentFeedback = await Feedback.find()
       .populate('user', 'rollNumber name')
       .sort({ date: -1 })
       .limit(5);
-    
+
     console.log('\n📝 RECENT FEEDBACK EXAMPLES:');
     recentFeedback.forEach((feedback, index) => {
       console.log(`   ${index + 1}. ${feedback.user.rollNumber} - ${feedback.date.toDateString()}`);
@@ -460,11 +460,11 @@ const generateTestFeedback = async () => {
         }
       });
     });
-    
+
     console.log('\n🎉 TEST FEEDBACK GENERATION COMPLETED!');
     console.log('💡 Your analytics system now has realistic data to work with!');
     console.log('🚀 Ready to implement Python analytics with meaningful datasets!');
-    
+
   } catch (error) {
     console.error('\n💥 FEEDBACK GENERATION FAILED:');
     console.error(`❌ Error: ${error.message}`);

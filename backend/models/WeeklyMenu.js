@@ -96,8 +96,7 @@ const weeklyMenuSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Index for faster queries
-weeklyMenuSchema.index({ isActive: 1 });
+// Note: isActive index is already set via { index: true } in the field definition above
 
 // Static method to get the active weekly menu
 weeklyMenuSchema.statics.getActiveMenu = async function() {
@@ -114,8 +113,6 @@ weeklyMenuSchema.statics.getTodaysMenu = async function() {
   const istTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
   const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
   const dayName = dayNames[istTime.getDay()];
-  
-  // console.log(`Debug: Today is ${dayName}, IST time: ${istTime.toLocaleString()}`);
   
   return {
     dayName,

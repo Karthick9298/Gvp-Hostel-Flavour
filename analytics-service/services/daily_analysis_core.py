@@ -6,14 +6,17 @@ Refactored from daily_analysis.py for FastAPI integration
 
 import sys
 import os
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from collections import Counter
 
 # Add parent directory to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from utils.database import DatabaseConnection, get_date_range
+from utils.database import DatabaseConnection
 from utils.chart_generator import ChartGenerator
+
+# IST offset constant (UTC+5:30)
+IST_OFFSET = timedelta(hours=5, minutes=30)
 
 
 def classify_sentiment(rating):
@@ -163,10 +166,13 @@ def analyze_daily_feedback(date_str: str, include_charts: bool = True) -> dict:
                 "status": "error"
             }
         
-        # Check if date is in the future
-        today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-        
-        if requested_date > today:
+        # Check if date is in the future (compare in IST)
+        # Get current date in IST by shifting UTC time by +5:30
+        now_utc = datetime.now(timezone.utc)
+        now_ist = now_utc + IST_OFFSET
+        today_ist = now_ist.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
+
+        if requested_date > today_ist:
             return {
                 "status": "no_data",
                 "message": f"Feedback will be available after {requested_date.strftime('%Y-%m-%d')}",
@@ -174,21 +180,28 @@ def analyze_daily_feedback(date_str: str, include_charts: bool = True) -> dict:
                 "type": "future_date"
             }
         
-        # Get date range for query
-        start_date, end_date = get_date_range(date_str)
-        
         # Get collections
         feedback_collection = db_conn.get_feedback_collection()
         users_collection = db_conn.get_users_collection()
         
         # Get total registered students
-        total_students = users_collection.count_documents({"isAdmin": False})
+        total_students = users_collection.count_documents({"isAdmin": False, "isActive": True})
         
-        # Fetch feedback data for the day
+        # Fix #3: MongoDB stores dates as ISODate (UTC).  Mongoose saves the IST
+        # midnight as a UTC Date object (e.g. IST 2025-10-14 00:00 => UTC 2025-10-13 18:30).
+        # We must query using a UTC date range that covers the full IST day.
+        # IST day start  = requested_date midnight IST = (requested_date - 5h30m) UTC
+        # IST day end    = next day midnight IST       = (requested_date + 18h30m) UTC
+        ist_day_start_utc = datetime(
+            requested_date.year, requested_date.month, requested_date.day,
+            0, 0, 0
+        ) - IST_OFFSET  # subtract offset to get UTC
+        ist_day_end_utc = ist_day_start_utc + timedelta(days=1)
+
         feedback_cursor = feedback_collection.find({
             "date": {
-                "$gte": start_date,
-                "$lt": end_date
+                "$gte": ist_day_start_utc,
+                "$lt":  ist_day_end_utc
             }
         })
         

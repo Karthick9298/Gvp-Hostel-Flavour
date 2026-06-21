@@ -19,6 +19,16 @@ import {
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
+const getMealIcon = (mealType) => {
+  switch (mealType?.toLowerCase()) {
+    case 'breakfast': return <FaCoffee className="text-yellow-500" />;
+    case 'lunch': return <FaUtensils className="text-orange-500" />;
+    case 'dinner': return <FaUtensils className="text-blue-500" />;
+    case 'night snacks': return <FaUtensils className="text-green-500" />;
+    default: return <FaUtensils className="text-gray-500" />;
+  }
+};
+
 const DailyAnalysisDashboard = () => {
   const [dailyData, setDailyData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -87,15 +97,7 @@ const DailyAnalysisDashboard = () => {
     }
   };
 
-  const getMealIcon = (mealType) => {
-    switch (mealType?.toLowerCase()) {
-      case 'breakfast': return <FaCoffee className="text-yellow-500" />;
-      case 'lunch': return <FaUtensils className="text-orange-500" />;
-      case 'dinner': return <FaUtensils className="text-blue-500" />;
-      case 'night snacks': return <FaUtensils className="text-green-500" />;
-      default: return <FaUtensils className="text-gray-500" />;
-    }
-  };
+
 
   if (loading) {
     return (

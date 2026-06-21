@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { feedbackAPI, menuAPI } from '../../config/api';
 import { useAuth } from '../../contexts/AuthContext';
 import StarRating from '../../components/common/StarRating';
@@ -32,76 +32,105 @@ import {
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
+const mealTypes = [
+  {
+    key: 'morning',
+    name: 'Breakfast',
+    icon: FaSun,
+    color: 'text-yellow-500',
+    bgColor: 'from-yellow-400 to-orange-400',
+    borderColor: 'border-yellow-300',
+    cardBg: 'bg-gradient-to-br from-yellow-50 to-orange-50',
+    time: '7:00 AM - 9:00 AM',
+    availableFrom: '9:00 AM',
+    emoji: '🌅',
+    description: 'Start your day right'
+  },
+  {
+    key: 'afternoon',
+    name: 'Lunch',
+    icon: FaCloudSun,
+    color: 'text-orange-500',
+    bgColor: 'from-orange-400 to-red-400',
+    borderColor: 'border-orange-300',
+    cardBg: 'bg-gradient-to-br from-orange-50 to-red-50',
+    time: '11:00 AM - 1:00 PM',
+    availableFrom: '1:00 PM',
+    emoji: '🌞',
+    description: 'Power through your day'
+  },
+  {
+    key: 'evening',
+    name: 'Snacks',
+    icon: FaCloudSun,
+    color: 'text-blue-500',
+    bgColor: 'from-blue-400 to-indigo-400',
+    borderColor: 'border-blue-300',
+    cardBg: 'bg-gradient-to-br from-blue-50 to-indigo-50',
+    time: '4:00 PM - 5:00 PM',
+    availableFrom: '5:00 PM',
+    emoji: '🌆',
+    description: 'Evening refreshments'
+  },
+  {
+    key: 'night',
+    name: 'Dinner',
+    icon: FaMoon,
+    color: 'text-purple-500',
+    bgColor: 'from-purple-400 to-pink-400',
+    borderColor: 'border-purple-300',
+    cardBg: 'bg-gradient-to-br from-purple-50 to-pink-50',
+    time: '7:00 PM - 9:00 PM',
+    availableFrom: '9:00 PM',
+    emoji: '🌙',
+    description: 'End your day satisfied'
+  }
+];
+
+const canSubmitMeal = (mealType) => {
+  const now = new Date();
+  // Convert to IST (UTC+5:30) to match backend
+  const istTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+  const hour = istTime.getHours();
+
+  switch (mealType) {
+    case 'morning':
+      return hour >= 9;
+    case 'afternoon':
+      return hour >= 13;  // Fixed: was 11, backend requires 13 (1 PM)
+    case 'evening':
+      return hour >= 17;
+    case 'night':
+      return hour >= 20;
+    default:
+      return false;
+  }
+};
+
+const getTimeBasedGreeting = () => {
+  const hour = new Date().getHours();
+  if (hour < 12) return { text: "Good Morning", icon: "🌅", color: "from-indigo-500 via-blue-500 to-cyan-500" };
+  if (hour < 17) return { text: "Good Afternoon", icon: "☀️", color: "from-blue-500 via-indigo-500 to-purple-500" };
+  if (hour < 20) return { text: "Good Evening", icon: "🌇", color: "from-purple-500 via-pink-500 to-rose-500" };
+  return { text: "Good Night", icon: "🌙", color: "from-indigo-600 via-purple-600 to-pink-600" };
+};
+
+// Module-level cache to persist data across component unmounts (e.g. navigation)
+let cachedDashboardData = null;
+
 const StudentDashboard = () => {
   const { user } = useAuth();
-  const [feedback, setFeedback] = useState(null);
-  const [submissionStats, setSubmissionStats] = useState(null);
-  const [todayMenu, setTodayMenu] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [feedback, setFeedback] = useState(cachedDashboardData?.feedback || null);
+  const [submissionStats, setSubmissionStats] = useState(cachedDashboardData?.submissionStats || null);
+  const [todayMenu, setTodayMenu] = useState(cachedDashboardData?.todayMenu || null);
+  const [loading, setLoading] = useState(!cachedDashboardData);
   const [submitting, setSubmitting] = useState(false);
 
-  const mealTypes = [
-    {
-      key: 'morning',
-      name: 'Breakfast',
-      icon: FaSun,
-      color: 'text-yellow-500',
-      bgColor: 'from-yellow-400 to-orange-400',
-      borderColor: 'border-yellow-300',
-      cardBg: 'bg-gradient-to-br from-yellow-50 to-orange-50',
-      time: '7:00 AM - 9:00 AM',
-      availableFrom: '9:00 AM',
-      emoji: '🌅',
-      description: 'Start your day right'
-    },
-    {
-      key: 'afternoon',
-      name: 'Lunch',
-      icon: FaCloudSun,
-      color: 'text-orange-500',
-      bgColor: 'from-orange-400 to-red-400',
-      borderColor: 'border-orange-300',
-      cardBg: 'bg-gradient-to-br from-orange-50 to-red-50',
-      time: '11:00 AM - 1:00 PM',
-      availableFrom: '1:00 PM',
-      emoji: '🌞',
-      description: 'Power through your day'
-    },
-    {
-      key: 'evening',
-      name: 'Snacks',
-      icon: FaCloudSun,
-      color: 'text-blue-500',
-      bgColor: 'from-blue-400 to-indigo-400',
-      borderColor: 'border-blue-300',
-      cardBg: 'bg-gradient-to-br from-blue-50 to-indigo-50',
-      time: '4:00 PM - 5:00 PM',
-      availableFrom: '5:00 PM',
-      emoji: '🌆',
-      description: 'Evening refreshments'
-    },
-    {
-      key: 'night',
-      name: 'Dinner',
-      icon: FaMoon,
-      color: 'text-purple-500',
-      bgColor: 'from-purple-400 to-pink-400',
-      borderColor: 'border-purple-300',
-      cardBg: 'bg-gradient-to-br from-purple-50 to-pink-50',
-      time: '7:00 PM - 9:00 PM',
-      availableFrom: '9:00 PM',
-      emoji: '🌙',
-      description: 'End your day satisfied'
-    }
-  ];
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading && !cachedDashboardData) {
+        setLoading(true);
+      }
       
       // Fetch feedback and stats first
       const [feedbackResponse, statsResponse] = await Promise.all([
@@ -109,47 +138,51 @@ const StudentDashboard = () => {
         feedbackAPI.getSubmissionStats()
       ]);
 
+      let newFeedback = null;
+      let newStats = null;
+
       if (feedbackResponse.status === 'success') {
-        console.log('=== FEEDBACK DEBUG ===');
-        console.log('Full feedbackResponse:', JSON.stringify(feedbackResponse, null, 2));
-        console.log('feedbackResponse.data:', feedbackResponse.data);
-        console.log('feedbackResponse.data.feedback:', feedbackResponse.data.feedback);
-        console.log('feedbackResponse.data.feedback.meals:', feedbackResponse.data.feedback?.meals);
-        setFeedback(feedbackResponse.data);
+        newFeedback = feedbackResponse.data;
+        setFeedback(newFeedback);
       }
 
       if (statsResponse.status === 'success') {
-        setSubmissionStats(statsResponse.data);
+        newStats = statsResponse.data;
+        setSubmissionStats(newStats);
       }
 
+      let newMenu = null;
       // Fetch today's menu separately to handle errors gracefully
       try {
-        console.log('Fetching today\'s menu...');
-        console.log('Current time:', new Date().toLocaleString());
-        console.log('Making API call to:', import.meta.env.VITE_API_URL || 'http://localhost:5000/api');
-        
         const menuResponse = await menuAPI.getToday();
-        console.log('Menu API response:', menuResponse);
-        
         if (menuResponse && menuResponse.status === 'success') {
-          console.log('Menu data received:', menuResponse.data.menu);
-          setTodayMenu(menuResponse.data.menu);
+          newMenu = menuResponse.data.menu;
+          setTodayMenu(newMenu);
         } else {
-          console.log('Menu response not successful or empty:', menuResponse);
           setTodayMenu(null);
         }
       } catch (error) {
-        console.error('Error fetching menu:', error);
-        console.error('Error details:', error.response || error.message);
         setTodayMenu(null);
       }
+
+      // Update cache
+      cachedDashboardData = {
+        feedback: newFeedback || cachedDashboardData?.feedback,
+        submissionStats: newStats || cachedDashboardData?.submissionStats,
+        todayMenu: newMenu !== null ? newMenu : cachedDashboardData?.todayMenu
+      };
+
     } catch (error) {
       console.error('Error fetching data:', error);
       toast.error('Failed to load dashboard data');
     } finally {
-      setLoading(false);
+      if (showLoading && !cachedDashboardData) {
+        setLoading(false);
+      } else {
+        setLoading(false);
+      }
     }
-  };
+  }, []);
 
   const handleFeedbackSubmit = async (mealType, rating, comment) => {
     try {
@@ -163,8 +196,8 @@ const StudentDashboard = () => {
 
       if (response.status === 'success') {
         toast.success(response.message);
-        // Refresh data
-        await fetchData();
+        // Refresh data without showing full-page spinner
+        await fetchData(false);
       }
     } catch (error) {
       console.error('Error submitting feedback:', error);
@@ -174,49 +207,13 @@ const StudentDashboard = () => {
     }
   };
 
-  const canSubmitMeal = (mealType) => {
-    const now = new Date();
-    // Convert to IST (UTC+5:30) to match backend
-    const istTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
-    const hour = istTime.getHours();
-
-    switch (mealType) {
-      case 'morning':
-        // Morning meal: 9 AM - 11:59 PM
-        return hour >= 9;
-      case 'afternoon':
-        // Afternoon meal: 1 PM - 11:59 PM
-        return hour >= 11;
-      case 'evening':
-        // Evening meal: 5 PM - 11:59 PM
-        return hour >= 17;
-      case 'night':
-        // Night meal: 8 PM - 11:59 PM
-        return hour >= 20;
-      default:
-        return false;
-    }
-  };
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const getMealStatus = (mealType) => {
-    console.log('=== MEAL STATUS DEBUG ===');
-    console.log('Current IST time:', new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
-    console.log('feedback object:', feedback);
-    console.log('feedback.feedback:', feedback?.feedback);
-    console.log('feedback.feedback.date:', feedback?.feedback?.date);
-    console.log('Trying to access meals for:', mealType);
-    
-    const mealData = feedback?.feedback?.meals?.[mealType]; // This is accessing feedback.feedback.meals
-    console.log('mealData for', mealType, ':', mealData);
-    
+    const mealData = feedback?.feedback?.meals?.[mealType];
     const hasSubmitted = mealData?.rating !== null && mealData?.rating !== undefined;
-    console.log('hasSubmitted for', mealType, ':', hasSubmitted);
-    
-    if (mealData?.submittedAt) {
-      console.log('Submitted at:', new Date(mealData.submittedAt).toLocaleString());
-      console.log('Submitted date (IST):', new Date(mealData.submittedAt).toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
-    }
-    
     const canSubmit = canSubmitMeal(mealType);
 
     if (hasSubmitted) {
@@ -243,14 +240,6 @@ const StudentDashboard = () => {
       </div>
     );
   }
-
-  const getTimeBasedGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return { text: "Good Morning", icon: "🌅", color: "from-indigo-500 via-blue-500 to-cyan-500" };
-    if (hour < 17) return { text: "Good Afternoon", icon: "☀️", color: "from-blue-500 via-indigo-500 to-purple-500" };
-    if (hour < 20) return { text: "Good Evening", icon: "🌇", color: "from-purple-500 via-pink-500 to-rose-500" };
-    return { text: "Good Night", icon: "🌙", color: "from-indigo-600 via-purple-600 to-pink-600" };
-  };
 
   const greeting = getTimeBasedGreeting();
 
