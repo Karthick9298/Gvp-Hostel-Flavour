@@ -24,8 +24,10 @@ import menuRoutes from './routes/menu.js';
 // Initialize Express app
 const app = express();
 
+app.set('trust-proxy', 1);
+
 // Connect to MongoDB
-connectDB();
+await connectDB();
 
 // ── Security Middleware ──────────────────────────────────────
 app.use(helmet());
