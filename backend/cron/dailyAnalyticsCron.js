@@ -12,18 +12,18 @@ export function startDailyAnalyticsCron() {
       const today = new Date();
       const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
       const yesterdayIST = getISTDate(yesterday);
-      
+
       // Format to YYYY-MM-DD
       const year = yesterdayIST.getFullYear();
       const month = String(yesterdayIST.getMonth() + 1).padStart(2, '0');
       const day = String(yesterdayIST.getDate()).padStart(2, '0');
       const dateString = `${year}-${month}-${day}`;
-      
+
       console.log(`Fetching daily analytics for yesterday: ${dateString}`);
-      
+
       // Fetch from python service
       const analysis = await analyticsService.getDailyAnalysis(dateString);
-      
+
       if (!analysis.error && analysis.status !== 'error') {
         // Save to DB
         await DailyAnalytics.findOneAndUpdate(
@@ -49,6 +49,6 @@ export function startDailyAnalyticsCron() {
   }, {
     timezone: "Asia/Kolkata"
   });
-  
+
   console.log('Daily analytics cron started (Runs at 1:00 AM IST)');
 }
